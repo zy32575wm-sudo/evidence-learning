@@ -1,0 +1,7 @@
+# 个人学习库，不要提交（只排除根目录的 vault/，不影响 templates/vault/）
+/vault/
+统计.md
+__pycache__/
+*.pyc
+.env
+.DS_Store
