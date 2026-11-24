@@ -593,6 +593,167 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
   z-index: 20;
 }
 
+/* Interactive Classroom (View 3) */
+.classroom-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 960px) {
+  .classroom-layout { grid-template-columns: 1fr; }
+}
+.station-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 9px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12.5px;
+  border: 1px solid transparent;
+  margin-bottom: 4px;
+}
+.station-nav-item:hover { background: var(--surface-subtle); }
+.station-nav-item.active {
+  background: var(--brand-soft);
+  border-color: var(--st-verif-bd);
+  font-weight: 700;
+}
+.cls-subtabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.cls-pill {
+  padding: 7px 15px;
+  border-radius: 7px;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.cls-pill.active {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+.case-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+@media (max-width: 720px) {
+  .case-compare { grid-template-columns: 1fr; }
+}
+.case-good {
+  background: var(--st-verif-bg);
+  border: 1px solid var(--st-verif-bd);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+.case-bad {
+  background: var(--st-due-bg);
+  border: 1px solid var(--st-due-bd);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 13px;
+}
+.qa-acc {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+}
+.qa-q {
+  width: 100%;
+  text-align: left;
+  padding: 12px 14px;
+  background: var(--surface-subtle);
+  border: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.qa-a {
+  padding: 12px 14px;
+  font-size: 13px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  display: none;
+  line-height: 1.65;
+}
+.qa-acc.open .qa-a { display: block; }
+
+.quiz-box {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.conf-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 16px;
+}
+.conf-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--surface-subtle);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.conf-btn.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.opt-btn {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  padding: 13px 15px;
+  border-radius: 8px;
+  border: 1.5px solid var(--line);
+  background: var(--surface);
+  font-size: 14px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.opt-btn:hover:not(:disabled) { border-color: var(--ink); background: var(--surface-subtle); }
+.opt-btn.correct {
+  border-color: var(--st-verif);
+  background: var(--st-verif-bg);
+  font-weight: 700;
+}
+.opt-btn.wrong {
+  border-color: var(--st-due);
+  background: var(--st-due-bg);
+}
+.explain-card {
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+.explain-card.ok { background: var(--st-verif-bg); border-left: 4px solid var(--st-verif); }
+.explain-card.err { background: var(--st-due-bg); border-left: 4px solid var(--st-due); }
+
 /* Modal for Sync / Export */
 .modal-mask {
   position: fixed;
@@ -645,8 +806,9 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
     <nav class="step-nav">
       <button class="step-tab active" data-view="overview"><span class="step-num">1</span>摸底与方案</button>
       <button class="step-tab" data-view="roadmap"><span class="step-num">2</span>证据路线画布</button>
-      <button class="step-tab" data-view="rolemap"><span class="step-num">3</span>岗位任务链地图</button>
-      <button class="step-tab" data-view="review"><span class="step-num">4</span>周复盘与雷达</button>
+      <button class="step-tab" data-view="classroom"><span class="step-num">3</span>互动闯关课堂</button>
+      <button class="step-tab" data-view="rolemap"><span class="step-num">4</span>岗位任务链地图</button>
+      <button class="step-tab" data-view="review"><span class="step-num">5</span>周复盘与雷达</button>
     </nav>
 
     <div class="top-actions">
@@ -662,6 +824,7 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
 
   <section id="view-overview" class="view-panel active"></section>
   <section id="view-roadmap" class="view-panel"></section>
+  <section id="view-classroom" class="view-panel"></section>
   <section id="view-rolemap" class="view-panel"></section>
   <section id="view-review" class="view-panel"></section>
 </div>
@@ -1209,7 +1372,8 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
         <div class="today-pill">
           <span class="today-tag">TODAY 今日焦点</span>
           <span><strong>${esc(focusNode.name)}</strong></span>
-          <button class="btn-cta" style="padding:5px 12px;font-size:12px" id="btn-focus-today">定位今日站</button>
+          <button class="btn-cta" style="padding:5px 12px;font-size:12px" id="btn-start-today-cls">▶ 开始今日站互动闯关</button>
+          <button class="btn-ghost" style="padding:5px 10px;font-size:12px" id="btn-focus-today">画布定位</button>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
           <select id="rm-filter" style="padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface-subtle);font-size:12px">
@@ -1237,6 +1401,10 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
             </div>
             <span class="badge ${selMeta.badgeCls}">${selMeta.label}</span>
           </div>
+
+          <button class="btn-cta" id="btn-enter-cls" style="width:100%;margin-top:12px;padding:10px 14px;font-size:13.5px">
+            ▶ 进入本站免打字互动课堂（精讲 · 追问 · 做题）→
+          </button>
 
           ${sel.status === "ai_passed" ? `<div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:var(--st-aipass-bg);color:var(--st-aipass);font-size:12px">
             <strong>防自嗨提醒：</strong>本站 AI 练习已达标，但尚未通过外部真题或真实交付验证，暂不点亮绿色「已学会」。
@@ -1302,6 +1470,19 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
     document.getElementById("btn-focus-today").addEventListener("click", () => {
       selectedNodeName = focusNode.name;
       renderRoadmap(curData());
+    });
+    document.getElementById("btn-start-today-cls").addEventListener("click", () => {
+      selectedNodeName = focusNode.name;
+      clsStep = "lesson";
+      clsQuizIdx = 0;
+      clsAnswered = null;
+      switchView("classroom");
+    });
+    document.getElementById("btn-enter-cls").addEventListener("click", () => {
+      clsStep = "lesson";
+      clsQuizIdx = 0;
+      clsAnswered = null;
+      switchView("classroom");
     });
     document.getElementById("rm-filter").addEventListener("change", e => {
       roadmapFilter = e.target.value;
@@ -1387,6 +1568,290 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
       }
       renderAll();
     });
+  }
+
+  // ==================== VIEW 2B: INTERACTIVE CLASSROOM (NO-TYPING LEARN & QUIZ) ====================
+  let clsStep = "lesson"; // lesson | qa | quiz
+  let clsQuizIdx = 0;
+  let clsConf = 85;
+  let clsAnswered = null; // { chosenIdx, correct, quiz }
+  let clsSessionResults = [];
+
+  function renderClassroom(M) {
+    const el = document.getElementById("view-classroom");
+    const nodes = M.nodes || [];
+    if (!nodes.length) {
+      el.innerHTML = `<div class="card"><h3>暂无可学习的路线站点</h3><p style="font-size:13px;color:var(--ink-secondary);margin-top:6px">请点击右上角「样例演示」或先拆解阶段 1 条目。</p></div>`;
+      return;
+    }
+    const defFocus = nodes.find(n => n.status === "due_or_blocked")
+      || nodes.find(n => n.status === "practicing")
+      || nodes.find(n => n.status === "todo")
+      || nodes[0];
+    if (!selectedNodeName || !nodes.some(n => n.name === selectedNodeName)) {
+      selectedNodeName = defFocus.name;
+    }
+    const selIdx = nodes.findIndex(n => n.name === selectedNodeName);
+    const sel = nodes[selIdx] || nodes[0];
+    const st = ST_INFO[sel.status] || ST_INFO.todo;
+    const rb = sel.rubric || {};
+    const crs = sel.course || {};
+    const quizzes = crs.quizzes || [];
+    const qas = crs.guided_qa || [];
+
+    const navHtml = nodes.map((n, idx) => {
+      const nst = ST_INFO[n.status] || ST_INFO.todo;
+      return `<div class="station-nav-item ${n.name === sel.name ? 'active' : ''}" data-cls-node="${esc(n.name)}">
+        <div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${idx + 1}. ${esc(n.name)}</div>
+        <span class="badge ${nst.badgeCls}">${nst.short}</span>
+      </div>`;
+    }).join("");
+
+    let bodyHtml = "";
+    if (clsStep === "lesson") {
+      const whyTxt = crs.why || `掌握「${sel.name}」的客观达标特征，避免凭主观感觉判断。`;
+      const pts = (crs.core_points && crs.core_points.length)
+        ? crs.core_points
+        : [
+            rb["优秀"] ? `优秀锚点：${rb["优秀"]}` : "先对齐每一档外行肉眼可数的客观特征",
+            rb["达标"] ? `合格底线：${rb["达标"]}` : "作答前先评估把握度，检验是否存在元认知高估",
+          ];
+      const goodCase = crs.good_case || (rb["优秀"] || rb["达标"] || "写出可观察、可复核的具体数量/位置/时序特征。");
+      const badCase = crs.bad_case || (rb["未达"] || "只写'很好/一般/差不多'等感性形容词，导致不同人打分严重分歧。");
+
+      bodyHtml = `
+        <div style="font-size:13px;color:var(--ink-secondary);margin-bottom:6px">为什么这站关键</div>
+        <div style="font-size:15px;font-weight:700;margin-bottom:14px">${esc(whyTxt)}</div>
+
+        <div style="font-size:13px;color:var(--ink-secondary);margin-bottom:6px">核心判断法则</div>
+        <ul class="triage-list" style="margin-bottom:14px">
+          ${pts.map(p => `<li>🔹 ${esc(p)}</li>`).join("")}
+        </ul>
+
+        <div class="case-compare">
+          <div class="case-good">
+            <div style="font-weight:800;color:var(--st-verif);margin-bottom:5px">✅ 达标正例（这样做稳过）</div>
+            <div>${esc(goodCase)}</div>
+          </div>
+          <div class="case-bad">
+            <div style="font-weight:800;color:var(--st-due);margin-bottom:5px">❌ 翻车反例（新手高频坑）</div>
+            <div>${esc(badCase)}</div>
+          </div>
+        </div>
+
+        ${(rb["优秀"] || rb["达标"]) ? `
+          <div style="margin-top:12px">
+            <div style="font-size:12px;color:var(--ink-secondary);font-weight:700;margin-bottom:6px">本站四档验收标准速查</div>
+            <table class="compact">
+              <tr><th style="width:52px">档位</th><th>看得见的判定特征</th></tr>
+              <tr><td><strong>优秀</strong></td><td>${esc(rb["优秀"] || "-")}</td></tr>
+              <tr><td><strong>达标</strong></td><td>${esc(rb["达标"] || "-")}</td></tr>
+              <tr><td>入门</td><td>${esc(rb["入门"] || "-")}</td></tr>
+              <tr><td>未达</td><td>${esc(rb["未达"] || "-")}</td></tr>
+            </table>
+          </div>
+        ` : ""}
+
+        <div style="margin-top:18px;display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap">
+          ${qas.length ? `<button class="btn-ghost" id="cls-go-qa">先看 ${qas.length} 个高频追问解答 →</button>` : ""}
+          <button class="btn-cta" id="cls-go-quiz">看懂了，开始互动闯关做题（${quizzes.length} 题）→</button>
+        </div>
+      `;
+    } else if (clsStep === "qa") {
+      bodyHtml = `
+        <p style="font-size:13px;color:var(--ink-secondary);margin-bottom:12px">不用自己想词打字——点击下方任意高频边界问题，直接展开良师拆解：</p>
+        ${qas.length ? qas.map((item, idx) => `
+          <div class="qa-acc ${idx === 0 ? 'open' : ''}">
+            <button class="qa-q"><span>💡 Q${idx + 1}：${esc(item.q)}</span><span>▾</span></button>
+            <div class="qa-a">${esc(item.a)}</div>
+          </div>
+        `).join("") : `<p style="font-size:13px;color:var(--ink-muted)">本站暂无额外追问卡，可直接开始闯关测验。</p>`}
+        <div style="margin-top:16px;display:flex;justify-content:space-between">
+          <button class="btn-ghost" id="cls-back-lesson">← 返回看正反例</button>
+          <button class="btn-cta" id="cls-qa-to-quiz">进入互动闯关做题（${quizzes.length} 题）→</button>
+        </div>
+      `;
+    } else {
+      // Quiz Mode!
+      if (!quizzes.length) {
+        bodyHtml = `<p style="font-size:13px;color:var(--ink-secondary)">本站为外部实操交付节点（无需做选择题），完成后可在「② 证据路线画布」右侧记录交付结果点亮绿色。</p>`;
+      } else if (clsQuizIdx >= quizzes.length) {
+        const okCnt = clsSessionResults.filter(x => x.ok).length;
+        const pct = Math.round((okCnt / quizzes.length) * 100);
+        const hasNext = selIdx + 1 < nodes.length;
+        bodyHtml = `
+          <div class="quiz-box" style="text-align:center;padding:20px 10px">
+            <div style="font-size:13px;color:var(--ink-secondary)">本站闯关完成</div>
+            <div style="font-size:32px;font-weight:800;margin:6px 0;color:${pct>=80?'var(--st-verif)':'var(--st-prac)'}">
+              答对 ${okCnt} / ${quizzes.length} 题（${pct}%）
+            </div>
+            <div style="margin-bottom:16px">当前节点状态已自动更新为：<span class="badge ${st.badgeCls}" style="font-size:13px;padding:4px 10px">${st.label}</span></div>
+            <p style="font-size:13px;color:var(--ink-secondary);max-width:520px;margin:0 auto 18px">
+              ${sel.status === "verified" ? "🎉 已通过仿真试标留出真题检验，节点已点亮绿色「外部已验证」！" : (sel.status === "ai_passed" ? "已通过练习题（封顶蓝色「待外部验证」），完成真实试标或交付后即可升绿。" : "还有错题未吃透，建议重看错题解析后再刷一遍。")}
+            </p>
+            <div style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap">
+              <button class="btn-ghost" id="cls-retry-quiz">重做本站题目</button>
+              ${hasNext ? `<button class="btn-cta" id="cls-next-station">进入下一站：${esc(nodes[selIdx + 1].name)} →</button>` : `<button class="btn-cta" id="cls-finish-to-dag">返回路线画布查看全景 →</button>`}
+            </div>
+          </div>
+        `;
+      } else {
+        const q = quizzes[clsQuizIdx];
+        const isHeldout = q.type === "heldout";
+        bodyHtml = `
+          <div class="quiz-box">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:12px;color:var(--ink-secondary);font-weight:700">第 ${clsQuizIdx + 1} / ${quizzes.length} 题 · 答完当场看反馈</span>
+              <span class="badge ${isHeldout ? 'b-verified' : 'b-ai_passed'}">${isHeldout ? '🎯 仿真试标/留出真题（达标升🟢）' : '📘 概念辨析练习（封顶🔵）'}</span>
+            </div>
+
+            <div style="font-size:12px;color:var(--ink-secondary)">第一步：点一下你作答前的把握度（防蒙对自嗨）</div>
+            <div class="conf-pills">
+              ${[[30, "30% 不太确定"], [60, "60% 有点印象"], [85, "85% 比较稳"], [100, "100% 笃定必对"]].map(([val, txt]) =>
+                `<button class="conf-btn ${clsConf === val ? 'selected' : ''}" data-cval="${val}" ${clsAnswered ? 'disabled' : ''}>${txt}</button>`
+              ).join("")}
+            </div>
+
+            <div style="font-size:16px;font-weight:700;margin-bottom:14px;line-height:1.5">${esc(q.stem)}</div>
+
+            <div>
+              ${(q.options || []).map((opt, oi) => {
+                let cls = "";
+                if (clsAnswered) {
+                  if (oi === q.answer) cls = "correct";
+                  else if (oi === clsAnswered.chosenIdx) cls = "wrong";
+                }
+                return `<button class="opt-btn ${cls}" data-opt="${oi}" ${clsAnswered ? 'disabled' : ''}>
+                  <span>${esc(opt)}</span>
+                </button>`;
+              }).join("")}
+            </div>
+
+            ${clsAnswered ? `
+              <div class="explain-card ${clsAnswered.correct ? 'ok' : 'err'}">
+                <div style="font-weight:800;margin-bottom:4px">
+                  ${clsAnswered.correct ? '✓ 回答正确！' : (`✗ 回答有误（你选前报了 ${clsConf}% 把握度${clsConf >= 75 ? ' —— 注意此处是元认知高估盲区！' : ''}）`)}
+                </div>
+                <div>${esc(q.explain || "")}</div>
+              </div>
+              <div style="margin-top:14px;display:flex;justify-content:flex-end">
+                <button class="btn-cta" id="cls-next-q">${clsQuizIdx + 1 < quizzes.length ? '下一题 →' : '查看本站结算与节点变色 →'}</button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+    }
+
+    el.innerHTML = `
+      <div class="classroom-layout">
+        <aside class="card" style="padding:12px">
+          <div class="sec-label" style="padding:0 4px"><span>全部学习站点</span><span>点选即学</span></div>
+          ${navHtml}
+        </aside>
+
+        <div class="card" style="padding:20px 24px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+            <div>
+              <div style="font-size:12px;color:var(--ink-secondary)">${esc(sel.module || "")}</div>
+              <h2 style="font-size:19px">${esc(sel.name)}</h2>
+            </div>
+            <span class="badge ${st.badgeCls}" style="font-size:12px;padding:4px 10px">${st.label}</span>
+          </div>
+
+          <div class="cls-subtabs">
+            <button class="cls-pill ${clsStep==='lesson'?'active':''}" data-cstep="lesson">① 核心精讲与正反例</button>
+            <button class="cls-pill ${clsStep==='qa'?'active':''}" data-cstep="qa">② 点选追问（${qas.length}）</button>
+            <button class="cls-pill ${clsStep==='quiz'?'active':''}" data-cstep="quiz">③ 闯关做题（${quizzes.length}）</button>
+          </div>
+
+          ${bodyHtml}
+        </div>
+      </div>
+    `;
+
+    el.querySelectorAll("[data-cls-node]").forEach(item => item.addEventListener("click", () => {
+      selectedNodeName = item.dataset.clsNode;
+      clsStep = "lesson";
+      clsQuizIdx = 0;
+      clsAnswered = null;
+      clsSessionResults = [];
+      renderClassroom(curData());
+    }));
+    el.querySelectorAll("[data-cstep]").forEach(b => b.addEventListener("click", () => {
+      clsStep = b.dataset.cstep;
+      if (clsStep === "quiz" && clsQuizIdx >= quizzes.length) { clsQuizIdx = 0; clsAnswered = null; clsSessionResults = []; }
+      renderClassroom(curData());
+    }));
+    const goQa = document.getElementById("cls-go-qa");
+    if (goQa) goQa.addEventListener("click", () => { clsStep = "qa"; renderClassroom(curData()); });
+    const goQuiz = document.getElementById("cls-go-quiz");
+    if (goQuiz) goQuiz.addEventListener("click", () => { clsStep = "quiz"; clsQuizIdx = 0; clsAnswered = null; clsSessionResults = []; renderClassroom(curData()); });
+    const backLes = document.getElementById("cls-back-lesson");
+    if (backLes) backLes.addEventListener("click", () => { clsStep = "lesson"; renderClassroom(curData()); });
+    const qaToQuiz = document.getElementById("cls-qa-to-quiz");
+    if (qaToQuiz) qaToQuiz.addEventListener("click", () => { clsStep = "quiz"; clsQuizIdx = 0; clsAnswered = null; clsSessionResults = []; renderClassroom(curData()); });
+
+    el.querySelectorAll(".qa-q").forEach(qbtn => qbtn.addEventListener("click", () => {
+      qbtn.parentElement.classList.toggle("open");
+    }));
+
+    el.querySelectorAll("[data-cval]").forEach(cb => cb.addEventListener("click", () => {
+      clsConf = Number(cb.dataset.cval);
+      renderClassroom(curData());
+    }));
+
+    el.querySelectorAll("[data-opt]").forEach(ob => ob.addEventListener("click", () => {
+      if (clsAnswered) return;
+      const chosen = Number(ob.dataset.opt);
+      const q = quizzes[clsQuizIdx];
+      const isOk = chosen === q.answer;
+      clsAnswered = { chosenIdx: chosen, correct: isOk };
+      clsSessionResults.push({ ok: isOk });
+
+      // Record into localStorage drafts so node status updates immediately!
+      const drafts = getDrafts();
+      drafts.push({
+        date: new Date().toISOString().slice(0, 10),
+        goal: M.goal_id || M.goal_name || "",
+        item: sel.name,
+        q: q.stem.slice(0, 36),
+        ans: (q.options[chosen] || "").slice(0, 28),
+        res: isOk ? "对" : "错",
+        conf: clsConf,
+        err: isOk ? "" : (clsConf >= 75 ? "概念不懂" : "步骤错"),
+        src: q.type === "heldout" ? "真题" : "AI出题"
+      });
+      setDrafts(drafts);
+      renderClassroom(curData());
+    }));
+
+    const nextQ = document.getElementById("cls-next-q");
+    if (nextQ) nextQ.addEventListener("click", () => {
+      clsQuizIdx += 1;
+      clsAnswered = null;
+      renderClassroom(curData());
+    });
+    const retryBtn = document.getElementById("cls-retry-quiz");
+    if (retryBtn) retryBtn.addEventListener("click", () => {
+      clsQuizIdx = 0;
+      clsAnswered = null;
+      clsSessionResults = [];
+      renderClassroom(curData());
+    });
+    const nextStBtn = document.getElementById("cls-next-station");
+    if (nextStBtn && selIdx + 1 < nodes.length) {
+      nextStBtn.addEventListener("click", () => {
+        selectedNodeName = nodes[selIdx + 1].name;
+        clsStep = "lesson";
+        clsQuizIdx = 0;
+        clsAnswered = null;
+        clsSessionResults = [];
+        renderClassroom(curData());
+      });
+    }
+    const finDag = document.getElementById("cls-finish-to-dag");
+    if (finDag) finDag.addEventListener("click", () => switchView("roadmap"));
   }
 
   // ==================== VIEW 3: RADIAL ROLE NETWORK GRAPH ====================
@@ -1888,6 +2353,7 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
 
     if (activeView === "overview") renderOverview(M);
     else if (activeView === "roadmap") renderRoadmap(M);
+    else if (activeView === "classroom") renderClassroom(M);
     else if (activeView === "rolemap") renderRoleMap(M);
     else if (activeView === "review") renderReview(M);
   }

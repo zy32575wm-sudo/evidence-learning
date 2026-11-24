@@ -218,6 +218,13 @@ def collect_vault_model(vault):
     rubric_txt = read_text(os.path.join(active_goal_dir, "评价标准.md")) if active_goal_dir else ""
     diag_txt = read_text(os.path.join(active_goal_dir, "诊断.md")) if active_goal_dir else ""
     role_map_path = os.path.join(active_goal_dir, "岗位地图.json") if active_goal_dir else ""
+    course_path = os.path.join(active_goal_dir, "课程包.json") if active_goal_dir else ""
+    courses = {}
+    if course_path and os.path.exists(course_path):
+        try:
+            courses = json.loads(read_text(course_path)) or {}
+        except Exception:
+            courses = {}
 
     plan_title = ""
     for ln in plan_txt.splitlines():
@@ -397,6 +404,7 @@ def collect_vault_model(vault):
             "ext_count": len(ext_scores),
             "ext_acc": round(sum(ext_scores) / len(ext_scores), 3) if ext_scores else None,
             "rubric": rubrics.get(nm, {}),
+            "course": courses.get(nm, {}),
             "recent": [
                 {
                     "date": x.get("日期", ""),
@@ -684,6 +692,44 @@ def build_demo_model():
                 "recent": [
                     {"date": today_s, "q": "挑出原片最具留存力的开场3秒", "ans": "保留了原片按时间顺序的寒暄开头", "res": "错", "conf": 85, "err": "概念不懂", "src": "AI出题"},
                 ],
+                "course": {
+                    "why": "短视频前3秒决定观众划走还是停留；剪辑不是按拍摄时间顺序拼素材，而是把最抓人的结果或冲突前置。",
+                    "core_points": [
+                        "砍掉一切『大家好我是XX，今天聊一下…』的无效寒暄",
+                        "从原片中后段挑出反常识结论、前后对比反差最强的一句倒提至 00:00",
+                    ],
+                    "good_case": "00:00 直接放成片修复前后同框对比：『同样一段词，改这3个字可用率从45%涨到90%』。",
+                    "bad_case": "00:00 放博主扶麦克风清嗓子：『哈喽大家晚上好，最近好多同学问我一个问题啊……』（观众2秒划走）。",
+                    "guided_qa": [
+                        {"q": "把结局前置了，后面不会剧透没看头吗？", "a": "前3秒给的是『结果反差』，观众留下是为了看『怎么做到的（How/Why）』，悬念反而更强。"},
+                    ],
+                    "quizzes": [
+                        {
+                            "type": "practice",
+                            "stem": "原片拍了5分钟做菜教程，哪一句最适合剪到 00:00 当黄金前3秒钩子？",
+                            "options": [
+                                "A. 大家好欢迎来到我的厨房，今天教大家做糖醋排骨",
+                                "B. 很多人炒糖色总是发苦，其实只因为多倒了一勺冷水（配焦糖冒泡特写）",
+                                "C. 首先我们去菜市场买两斤猪肋排洗干净备用",
+                                "D. 感谢大家上一期视频的点赞支持"
+                            ],
+                            "answer": 1,
+                            "explain": "B 直接戳中高频痛点（发苦）并给出具体反常识归因（多倒一勺冷水）配强视觉特写；A/C/D 全是平铺直叙寒暄。"
+                        },
+                        {
+                            "type": "heldout",
+                            "stem": "两个同机位、同景别的口播镜头删掉废话后直接硬接在一起，画面最容易出现什么问题？",
+                            "options": [
+                                "A. 跳切：人物头部位置突然瞬移跳动一下",
+                                "B. 音频采样率丢失",
+                                "C. 色彩空间自动变灰",
+                                "D. 导出帧率减半"
+                            ],
+                            "answer": 0,
+                            "explain": "同机位同景别删气口硬接会产生明显视觉跳切；通常用 110%-115% 无感推近切景别、J-Cut 或覆盖贴切 B-roll 消除。"
+                        }
+                    ]
+                },
             },
             {
                 "name": "音乐情绪曲线与卡点克制",
