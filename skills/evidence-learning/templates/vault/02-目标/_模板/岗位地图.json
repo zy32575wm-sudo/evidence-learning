@@ -1,0 +1,35 @@
+{
+  "role_name": "",
+  "industry_city_level": "",
+  "sample_count": null,
+  "collected_at": "",
+  "is_verified_sample": false,
+  "salary_range_k": {
+    "low": null,
+    "mid": null,
+    "high": null
+  },
+  "summary": "",
+  "modules": [
+    {
+      "name": "",
+      "tasks": [
+        {
+          "name": "",
+          "weight": 5,
+          "frequency": "",
+          "chain": [
+            "01 ",
+            "02 ",
+            "03 "
+          ],
+          "input": "",
+          "output": "",
+          "collaborators": "",
+          "skills": [],
+          "tools": []
+        }
+      ]
+    }
+  ]
+}

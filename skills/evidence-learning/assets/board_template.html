@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>有据学习 · 交互式学习与岗位地图工作台</title>
+<style>
+:root {
+  --bg: #F5F4EE;
+  --bg-grid: #EAE7DF;
+  --surface: #FFFFFF;
+  --surface-subtle: #FAF9F5;
+  --ink: #191B19;
+  --ink-secondary: #5C615B;
+  --ink-muted: #8A8F88;
+  --line: #E2DFD6;
+  --line-strong: #C8C4B8;
+  --brand: #1B5E40;
+  --brand-soft: #E6F2EC;
+  --cta: #C86428;
+  --cta-ink: #FFFFFF;
+
+  /* 五色证据状态机 */
+  --st-verif: #1B6B45;
+  --st-verif-bg: #E6F4EC;
+  --st-verif-bd: #88C5A6;
+
+  --st-aipass: #1B5C8A;
+  --st-aipass-bg: #E7F1F9;
+  --st-aipass-bd: #8AB8DB;
+
+  --st-prac: #AE6B14;
+  --st-prac-bg: #FDF4E3;
+  --st-prac-bd: #E4B976;
+
+  --st-due: #BF3E26;
+  --st-due-bg: #FCECE9;
+  --st-due-bd: #E59889;
+
+  --st-todo: #7E837D;
+  --st-todo-bg: #F1F0EC;
+  --st-todo-bd: #D4D1C8;
+}
+
+html[data-theme="dark"] {
+  --bg: #101213;
+  --bg-grid: #1B1E20;
+  --surface: #181B1D;
+  --surface-subtle: #202427;
+  --ink: #ECEAE3;
+  --ink-secondary: #A6AAA4;
+  --ink-muted: #6E736D;
+  --line: #2B3033;
+  --line-strong: #41484C;
+  --brand: #48B882;
+  --brand-soft: #173326;
+  --cta: #D9793B;
+  --cta-ink: #FFFFFF;
+
+  --st-verif: #4CC38A;
+  --st-verif-bg: #152E22;
+  --st-verif-bd: #2A6347;
+
+  --st-aipass: #5EB0EF;
+  --st-aipass-bg: #152838;
+  --st-aipass-bd: #2B577A;
+
+  --st-prac: #F0B153;
+  --st-prac-bg: #2E2414;
+  --st-prac-bd: #6B5023;
+
+  --st-due: #F2755E;
+  --st-due-bg: #321A16;
+  --st-due-bd: #733429;
+
+  --st-todo: #8F958E;
+  --st-todo-bg: #222628;
+  --st-todo-bd: #393F42;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.55;
+  min-height: 100vh;
+}
+button, input, select, textarea { font-family: inherit; color: inherit; }
+
+/* Top Header */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: 0 20px;
+}
+.topbar-inner {
+  max-width: 1380px;
+  min-height: 58px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 8px 0;
+}
+.brand-wrap { display: flex; align-items: center; gap: 12px; }
+.brand-mark {
+  width: 30px; height: 30px;
+  border-radius: 6px;
+  background: var(--brand);
+  color: #FFF;
+  font-weight: 800;
+  font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  letter-spacing: -0.5px;
+}
+.brand-title { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.brand-sub { font-size: 12px; color: var(--ink-secondary); }
+
+.step-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.step-tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--ink-secondary);
+  padding: 6px 13px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.step-tab:hover { background: var(--surface-subtle); color: var(--ink); }
+.step-tab.active {
+  background: var(--brand-soft);
+  color: var(--brand);
+  border-color: var(--st-verif-bd);
+}
+.step-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line-strong);
+}
+.step-tab.active .step-num {
+  background: var(--brand);
+  color: #FFF;
+  border-color: var(--brand);
+}
+
+.top-actions { display: flex; align-items: center; gap: 8px; }
+.icon-btn {
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  padding: 6px 11px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.icon-btn:hover { border-color: var(--line-strong); }
+.icon-btn.demo-active {
+  background: var(--st-prac-bg);
+  color: var(--st-prac);
+  border-color: var(--st-prac-bd);
+}
+
+/* Container & Common Cards */
+.page-wrap { max-width: 1380px; margin: 0 auto; padding: 18px 20px 56px; }
+.view-panel { display: none; }
+.view-panel.active { display: block; }
+
+.demo-banner {
+  background: var(--st-prac-bg);
+  border: 1px solid var(--st-prac-bd);
+  color: var(--st-prac);
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.quote-hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--brand);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 16px;
+}
+.quote-hero h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+.quote-hero p { font-size: 13px; color: var(--ink-secondary); }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px 18px;
+}
+.sec-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 14px; margin-bottom: 16px; }
+.grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; margin-bottom: 16px; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.b-verified { color: var(--st-verif); background: var(--st-verif-bg); border: 1px solid var(--st-verif-bd); }
+.b-ai_passed { color: var(--st-aipass); background: var(--st-aipass-bg); border: 1px solid var(--st-aipass-bd); }
+.b-practicing { color: var(--st-prac); background: var(--st-prac-bg); border: 1px solid var(--st-prac-bd); }
+.b-due_or_blocked { color: var(--st-due); background: var(--st-due-bg); border: 1px solid var(--st-due-bd); }
+.b-todo { color: var(--st-todo); background: var(--st-todo-bg); border: 1px solid var(--st-todo-bd); }
+
+/* Segmented 5-block bar for 4D level */
+.dim-item { padding: 10px 0; border-bottom: 1px dashed var(--line); }
+.dim-item:last-child { border-bottom: none; }
+.dim-hdr { display: flex; justify-content: space-between; align-items: center; font-size: 13px; margin-bottom: 6px; }
+.seg-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; max-width: 240px; }
+.seg-5 span { height: 7px; border-radius: 3px; background: var(--st-todo-bg); }
+.seg-5 span.on { background: var(--brand); }
+
+/* Triage 3 columns */
+.triage-col { border-top: 3px solid var(--line-strong); }
+.triage-col.stock { border-top-color: var(--st-verif); }
+.triage-col.gaps { border-top-color: var(--st-due); }
+.triage-col.first { border-top-color: var(--st-aipass); }
+.triage-list { list-style: none; margin-top: 8px; }
+.triage-list li {
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--line);
+  font-size: 13px;
+}
+.triage-list li:last-child { border-bottom: none; }
+
+/* Time Budget & Plan Tier Cards */
+.ledger-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.ledger-box {
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.ledger-num { font-size: 24px; font-weight: 800; margin-top: 2px; }
+.tier-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.tier-card {
+  border: 1.5px solid var(--line);
+  background: var(--surface-subtle);
+  border-radius: 8px;
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+}
+.tier-card:hover { border-color: var(--line-strong); }
+.tier-card.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+.btn-cta {
+  background: var(--cta);
+  color: var(--cta-ink);
+  border: none;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--brand);
+  color: #FFF;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-ghost {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line-strong);
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-ghost.active {
+  background: var(--ink);
+  color: var(--surface);
+  border-color: var(--ink);
+}
+
+/* View 2: Roadmap DAG Canvas + Drawer */
+.roadmap-bar {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.today-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.today-tag {
+  background: var(--st-prac-bg);
+  color: var(--st-prac);
+  border: 1px solid var(--st-prac-bd);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.workspace-split {
+  display: grid;
+  grid-template-columns: 1fr 390px;
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 1024px) {
+  .workspace-split { grid-template-columns: 1fr; }
+}
+
+.canvas-shell {
+  position: relative;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(to right, var(--bg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--bg-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  height: 620px;
+  overflow: hidden;
+  user-select: none;
+}
+.canvas-viewport {
+  position: absolute;
+  top: 0; left: 0;
+  transform-origin: 0 0;
+  cursor: grab;
+}
+.canvas-viewport:active { cursor: grabbing; }
+.dag-node {
+  position: absolute;
+  width: 196px;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1.5px solid var(--st-todo-bd);
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.04);
+}
+.dag-node:hover { border-color: var(--ink); }
+.dag-node.selected { outline: 2.5px solid var(--cta); outline-offset: 2px; }
+.dag-node.dimmed { opacity: 0.28; }
+
+.dag-node.st-verified {
+  background: var(--st-verif);
+  border-color: var(--st-verif);
+  color: #FFFFFF;
+}
+.dag-node.st-verified .dn-sub { color: rgba(255,255,255,0.85); }
+.dag-node.st-ai_passed {
+  background: var(--st-aipass-bg);
+  border-color: var(--st-aipass);
+}
+.dag-node.st-practicing {
+  background: var(--st-prac-bg);
+  border-color: var(--st-prac);
+}
+.dag-node.st-due_or_blocked {
+  background: var(--st-due-bg);
+  border-color: var(--st-due);
+  border-width: 2px;
+}
+.dag-node.st-todo {
+  background: var(--surface);
+  border-style: dashed;
+  border-color: var(--st-todo-bd);
+}
+.dn-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-bottom: 3px; }
+.dn-idx {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 99px;
+  background: rgba(0,0,0,0.07);
+}
+.dag-node.st-verified .dn-idx { background: rgba(255,255,255,0.22); color: #FFF; }
+.dn-title { font-size: 13px; font-weight: 700; line-height: 1.35; }
+.dn-sub { font-size: 11px; color: var(--ink-secondary); margin-top: 4px; display: flex; justify-content: space-between; }
+.stage-col-hdr {
+  position: absolute;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-secondary);
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--line);
+  width: 196px;
+}
+
+.canvas-ZoomCtrl {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+.zoom-btn {
+  width: 30px; height: 30px;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.canvas-legend {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--ink-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  z-index: 10;
+}
+
+/* Side Drawer */
+.drawer-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  max-height: 620px;
+  overflow-y: auto;
+}
+.drawer-sec {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.drawer-sec h4 {
+  font-size: 12px;
+  color: var(--ink-secondary);
+  margin-bottom: 8px;
+}
+table.compact { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.compact th, table.compact td {
+  text-align: left;
+  padding: 6px 7px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+table.compact th { color: var(--ink-secondary); background: var(--surface-subtle); font-weight: 600; }
+
+.ask-chip {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 12px;
+  margin-bottom: 6px;
+  cursor: pointer;
+}
+.ask-chip:hover { border-color: var(--brand); }
+
+.field { margin-bottom: 8px; }
+.field label { display: block; font-size: 12px; color: var(--ink-secondary); margin-bottom: 3px; }
+.field input[type="text"], .field select, .field textarea {
+  width: 100%;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
+/* View 3: Role Network Studio (3-col) */
+.role-studio {
+  display: grid;
+  grid-template-columns: 260px 1fr 360px;
+  gap: 14px;
+  align-items: start;
+}
+@media (max-width: 1160px) {
+  .role-studio { grid-template-columns: 1fr; }
+}
+.chain-item {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  padding: 6px 8px;
+  background: var(--surface-subtle);
+  border-radius: 6px;
+  margin-bottom: 5px;
+}
+.chain-num { font-weight: 800; color: var(--brand); min-width: 20px; }
+.io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.io-box {
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--st-aipass-bg);
+  color: var(--st-aipass);
+  border: 1px solid var(--st-aipass-bd);
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 2px 4px 2px 0;
+  cursor: pointer;
+}
+.pill-link:hover { filter: brightness(0.95); }
+
+.graph-tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 8px 11px;
+  font-size: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  max-width: 240px;
+  display: none;
+  z-index: 20;
+}
+
+/* Modal for Sync / Export */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 80;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.modal-mask.open { display: flex; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  max-width: 640px;
+  width: 100%;
+  padding: 20px;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--ink);
+  color: var(--surface);
+  padding: 9px 15px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  display: none;
+  z-index: 100;
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand-wrap">
+      <div class="brand-mark">有据</div>
+      <div>
+        <div class="brand-title" id="hdr-title">有据学习 · Evidence Learning</div>
+        <div class="brand-sub" id="hdr-sub">本地离线证据工作台</div>
+      </div>
+    </div>
+
+    <nav class="step-nav">
+      <button class="step-tab active" data-view="overview"><span class="step-num">1</span>摸底与方案</button>
+      <button class="step-tab" data-view="roadmap"><span class="step-num">2</span>证据路线画布</button>
+      <button class="step-tab" data-view="rolemap"><span class="step-num">3</span>岗位任务链地图</button>
+      <button class="step-tab" data-view="review"><span class="step-num">4</span>周复盘与雷达</button>
+    </nav>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="btn-toggle-demo" title="切换真实学习库 / 内置完整交互样例">样例演示</button>
+      <button class="icon-btn" id="btn-open-sync">导出 / 手机续接</button>
+      <button class="icon-btn" id="btn-theme">深浅色</button>
+    </div>
+  </div>
+</header>
+
+<div class="page-wrap">
+  <div id="demo-banner-slot"></div>
+
+  <section id="view-overview" class="view-panel active"></section>
+  <section id="view-roadmap" class="view-panel"></section>
+  <section id="view-rolemap" class="view-panel"></section>
+  <section id="view-review" class="view-panel"></section>
+</div>
+
+<!-- Export / Mobile Sync Modal -->
+<div class="modal-mask" id="sync-modal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-size:16px">导出学习档案 & 跨端续接</h3>
+      <button class="btn-ghost" id="btn-close-sync">关闭</button>
+    </div>
+    <p style="font-size:12px;color:var(--ink-secondary);margin-bottom:12px">
+      所有数据归你本人所有（纯本地 Markdown / CSV）。在网页闯关台新增的作答可一键导出追加回 <code>vault/data/attempts.csv</code>；离开电脑时复制「手机续接快照」发给任意 AI 即可开启 5 分钟快测。
+    </p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <button class="btn-primary" id="m-copy-snap">复制手机端续接快照</button>
+      <button class="btn-ghost" id="m-copy-csv">复制暂存 CSV 行</button>
+      <button class="btn-ghost" id="m-dl-csv">下载新增 attempts.csv</button>
+      <button class="btn-ghost" id="m-clear-draft" style="color:var(--st-due)">清空网页暂存</button>
+    </div>
+    <textarea id="m-preview" rows="9" readonly style="width:100%;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-subtle);font-size:12px"></textarea>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="vault-data" type="application/json">__VAULT_JSON__</script>
+<script id="demo-data" type="application/json">__DEMO_JSON__</script>
+<script>
+(function() {
+  const RAW_VAULT = JSON.parse(document.getElementById("vault-data").textContent);
+  const DEMO_VAULT = JSON.parse(document.getElementById("demo-data").textContent);
+
+  const vaultIsEmpty = (!RAW_VAULT.nodes || RAW_VAULT.nodes.length === 0) && (!RAW_VAULT.role_map);
+  let useDemo = vaultIsEmpty;
+
+  const ST_INFO = {
+    verified:       { label: "🟢 外部已验证", short: "外部已证", badgeCls: "b-verified", nodeCls: "st-verified", color: "var(--st-verif)" },
+    ai_passed:      { label: "🔵 练习达标·待外验", short: "待外部验证", badgeCls: "b-ai_passed", nodeCls: "st-ai_passed", color: "var(--st-aipass)" },
+    practicing:     { label: "🟡 学习练习中", short: "练习中", badgeCls: "b-practicing", nodeCls: "st-practicing", color: "var(--st-prac)" },
+    due_or_blocked: { label: "🟠 到期/高估盲区", short: "优先处理", badgeCls: "b-due_or_blocked", nodeCls: "st-due_or_blocked", color: "var(--st-due)" },
+    todo:           { label: "⚪ 未开始", short: "未开始", badgeCls: "b-todo", nodeCls: "st-todo", color: "var(--st-todo)" }
+  };
+
+  let activeView = "overview";
+  let roadmapSubMode = "dag"; // dag | week | table
+  let roadmapFilter = "all";
+  let selectedTierIdx = 1;
+  let selectedNodeName = "";
+  let roleSubMode = "graph"; // graph | list
+  let roleSearch = "";
+  let selectedRoleItem = null; // { type: 'task'|'skill'|'module', data: ... }
+
+  function curData() {
+    const base = useDemo ? JSON.parse(JSON.stringify(DEMO_VAULT)) : JSON.parse(JSON.stringify(RAW_VAULT));
+    applyLocalDraftsToModel(base);
+    return base;
+  }
+
+  function lsKey() {
+    return "evlearn_drafts_" + (useDemo ? "demo" : (RAW_VAULT.goal_id || "vault"));
+  }
+  function getDrafts() {
+    try { return JSON.parse(localStorage.getItem(lsKey()) || "[]"); } catch(e) { return []; }
+  }
+  function setDrafts(arr) {
+    try { localStorage.setItem(lsKey(), JSON.stringify(arr)); } catch(e) {}
+  }
+
+  // Apply browser-recorded attempts dynamically so node color updates live!
+  function applyLocalDraftsToModel(M) {
+    const drafts = getDrafts();
+    if (!drafts.length) return;
+    M.total_attempts = (M.total_attempts || 0) + drafts.length;
+    drafts.forEach(dr => {
+      let nd = M.nodes.find(n => n.name === dr.item);
+      if (!nd) return;
+      const s = dr.res === "对" ? 1.0 : (dr.res === "部分" ? 0.5 : 0.0);
+      const isExt = (dr.src === "真题" || dr.src === "外部测验" || dr.src === "实际交付");
+      if (isExt) {
+        const tot = (nd.ext_acc || 0) * (nd.ext_count || 0) + s;
+        nd.ext_count = (nd.ext_count || 0) + 1;
+        nd.ext_acc = tot / nd.ext_count;
+      } else {
+        const tot = (nd.ai_acc || 0) * (nd.ai_count || 0) + s;
+        nd.ai_count = (nd.ai_count || 0) + 1;
+        nd.ai_acc = tot / nd.ai_count;
+      }
+      nd.recent = nd.recent || [];
+      nd.recent.push({ date: dr.date, q: dr.q, ans: dr.ans, res: dr.res, conf: Number(dr.conf), err: dr.err, src: dr.src });
+      const highConfWrong = Number(dr.conf) >= 75 && s < 0.5;
+      if (highConfWrong) {
+        nd.high_conf_err = true;
+        nd.status = "due_or_blocked";
+      } else if (nd.ext_count >= 2 && nd.ext_acc >= 0.8) {
+        nd.high_conf_err = false;
+        nd.status = "verified";
+      } else if ((nd.ai_count + nd.ext_count) >= 2 && s >= 0.8) {
+        if (nd.status !== "verified") nd.status = "ai_passed";
+      } else if (nd.status === "todo") {
+        nd.status = "practicing";
+      }
+    });
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.style.display = "block";
+    clearTimeout(t._tm);
+    t._tm = setTimeout(() => { t.style.display = "none"; }, 2600);
+  }
+
+  function copyText(txt, tip) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(() => toast(tip || "已复制"));
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = txt; document.body.appendChild(ta);
+      ta.select(); document.execCommand("copy");
+      document.body.removeChild(ta);
+      toast(tip || "已复制");
+    }
+  }
+
+  function switchView(v) {
+    activeView = v;
+    document.querySelectorAll(".step-tab").forEach(b => b.classList.toggle("active", b.dataset.view === v));
+    document.querySelectorAll(".view-panel").forEach(p => p.classList.toggle("active", p.id === "view-" + v));
+    renderAll();
+  }
+  document.querySelectorAll(".step-tab").forEach(b => b.addEventListener("click", () => switchView(b.dataset.view)));
+
+  // Theme toggle
+  document.getElementById("btn-theme").addEventListener("click", () => {
+    const html = document.documentElement;
+    html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+    renderAll();
+  });
+
+  // Demo toggle
+  document.getElementById("btn-toggle-demo").addEventListener("click", () => {
+    useDemo = !useDemo;
+    selectedNodeName = "";
+    selectedRoleItem = null;
+    renderAll();
+    toast(useDemo ? "已切换至内置完整交互样例" : "已切换回你的本地 vault 真实记录");
+  });
+
+  // Sync Modal
+  function buildDraftCsv() {
+    const escCsv = v => {
+      const s = String(v == null ? "" : v);
+      return (s.includes(",") || s.includes('"') || s.includes("\n")) ? '"' + s.replace(/"/g, '""') + '"' : s;
+    };
+    return getDrafts().map(r => [r.date, r.goal, r.item, r.q, r.ans, r.res, r.conf, "", r.err, r.src].map(escCsv).join(",")).join("\n");
+  }
+
+  function buildMobileSnap(M) {
+    const c = countStatuses(M.nodes);
+    const dueStr = (M.due || []).map(d => d.item).join("、") || "无";
+    const blindStr = (M.blindspots || []).join("、") || "无";
+    const nextNodes = M.nodes.filter(n => n.status !== "verified").slice(0, 3).map(n => n.name).join("、") || "无";
+    const csv = buildDraftCsv();
+    return [
+      `【有据学习 · 跨端续接快照 ${M.generated_at}】`,
+      `当前目标：${M.goal_name}（🟢外部已证 ${c.verified}/${M.nodes.length}，🔵练习通过待外验 ${c.ai_passed}/${M.nodes.length}）`,
+      `到期复习：${dueStr} ｜ 高把握度盲区：${blindStr}`,
+      `优先推进节点：${nextNodes}`,
+      csv ? `网页暂存新增记录：\n${csv}` : "",
+      `请按「有据学习」规则带我继续：若我只有 5–10 分钟请走 D-Lite 手机快测，每题作答前先让我报把握度(0-100)，在我交出独立作答前严禁给答案。`
+    ].filter(Boolean).join("\n");
+  }
+
+  document.getElementById("btn-open-sync").addEventListener("click", () => {
+    const M = curData();
+    const csv = buildDraftCsv();
+    document.getElementById("m-preview").value = csv || buildMobileSnap(M);
+    document.getElementById("sync-modal").classList.add("open");
+  });
+  document.getElementById("btn-close-sync").addEventListener("click", () => {
+    document.getElementById("sync-modal").classList.remove("open");
+  });
+  document.getElementById("m-copy-snap").addEventListener("click", () => {
+    const s = buildMobileSnap(curData());
+    document.getElementById("m-preview").value = s;
+    copyText(s, "手机续接快照已复制");
+  });
+  document.getElementById("m-copy-csv").addEventListener("click", () => {
+    const csv = buildDraftCsv();
+    if (!csv) { toast("当前暂无网页新增自测记录"); return; }
+    document.getElementById("m-preview").value = csv;
+    copyText(csv, "CSV 追加行已复制，粘贴至 vault/data/attempts.csv 末尾即可");
+  });
+  document.getElementById("m-dl-csv").addEventListener("click", () => {
+    const csv = buildDraftCsv();
+    if (!csv) { toast("当前暂无网页新增自测记录"); return; }
+    const blob = new Blob(["\uFEFF日期,目标,条目,题目,作答,结果,把握度,用时秒,错因,题目来源\n" + csv + "\n"], { type: "text/csv;charset=utf-8;" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "attempts_append.csv";
+    a.click();
+  });
+  document.getElementById("m-clear-draft").addEventListener("click", () => {
+    setDrafts([]);
+    document.getElementById("m-preview").value = buildMobileSnap(curData());
+    renderAll();
+    toast("已清空网页暂存记录");
+  });
+
+  function countStatuses(nodes) {
+    const c = { verified: 0, ai_passed: 0, practicing: 0, due_or_blocked: 0, todo: 0 };
+    (nodes || []).forEach(n => { c[n.status] = (c[n.status] || 0) + 1; });
+    return c;
+  }
+
+  // ==================== VIEW 1: OVERVIEW ====================
+  function renderOverview(M) {
+    const el = document.getElementById("view-overview");
+    const c = countStatuses(M.nodes);
+    const total = M.nodes.length;
+    const tb = M.time_budget || {};
+
+    let verdictTitle = "先完成基线摸底与时间对账，再挑一条适合你的路径。";
+    let verdictSub = "AI 出的题答对只算「练习通过」，唯有未见真题限时测、真人盲评或真实产出达标才算「学会」。";
+    if (total > 0) {
+      if (c.due_or_blocked > 0) {
+        verdictTitle = `发现 ${c.due_or_blocked} 个到期复习或高把握度盲区节点，建议优先排雷后再推进新模块。`;
+      } else if (c.ai_passed > 0 && c.verified === 0) {
+        verdictTitle = `你已有 ${c.ai_passed} 站通过 AI 练习，但外部证据仍为 0 —— 别停留在舒适区，尽快做一次真题或真实交付验证！`;
+      } else if (c.verified > 0) {
+        verdictTitle = `稳步推进中：已有 ${c.verified}/${total} 站拿到外部硬证据，继续攻克首站闭环与关键缺口。`;
+      } else if (M.first_loop) {
+        verdictTitle = `属于「有方向待实操」阶段：先走通第一站最小闭环，比单补任何零散概念都有效。`;
+      }
+      verdictSub = `依据：累计 ${M.total_attempts} 次作答实测 · 连续活跃 ${M.active_streak_days} 天 · 累计投入 ${M.total_mins} 分钟`;
+    }
+
+    const dimsHtml = (M.dims || []).map(d => {
+      const sc = d.score != null ? Math.round(d.score) : 0;
+      let bars = "";
+      for (let i = 1; i <= 5; i++) bars += `<span class="${i <= sc ? 'on' : ''}"></span>`;
+      return `<div class="dim-item">
+        <div class="dim-hdr">
+          <div><strong>${esc(d.name)}</strong> ${d.note ? `<span style="color:var(--ink-secondary);font-size:12px">· ${esc(d.note)}</span>` : ""}</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="seg-5" style="width:130px">${bars}</div>
+            <span style="font-weight:700;min-width:34px;text-align:right">${d.score != null ? d.score.toFixed(1) : "-"}</span>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+
+    const tiers = (M.plan_tiers && M.plan_tiers.length) ? M.plan_tiers : [
+      { label: "保底最小闭环版：只抓高频必考/必做主线，最快做出第 1 件成品", tag: "轻量保底", selected: false },
+      { label: "标准达标版：主线必做 + 复习检查站 + 外部真题/交付验收", tag: "推荐稳健", selected: true },
+      { label: "深入拓展版：标准路线 + 进阶支线与高难挑战站全覆盖", tag: "时间充裕", selected: false }
+    ];
+    if (selectedTierIdx >= tiers.length) selectedTierIdx = 0;
+
+    const reqH = tb.required_hours != null ? tb.required_hours + " 小时" : "待估算";
+    const avH = tb.available_hours != null ? tb.available_hours + " 小时" : "待核算";
+    const diffH = tb.surplus_hours != null
+      ? (tb.surplus_hours >= 0 ? `+${tb.surplus_hours} 小时富余` : `${tb.surplus_hours} 小时缺口`)
+      : "待填截止日与每日时长";
+
+    el.innerHTML = `
+      <div class="quote-hero">
+        <h2>${esc(verdictTitle)}</h2>
+        <p>${esc(verdictSub)}</p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="sec-label"><span>A · 四维实测水平</span><span>1–5 档（依据诊断实测）</span></div>
+          ${dimsHtml}
+        </div>
+
+        <div class="card">
+          <div class="sec-label"><span>B · 时间对账与路线拍板（人定方向）</span><span>已按 0.8 容错系数折算</span></div>
+          <div class="ledger-row">
+            <div class="ledger-box">
+              <div style="font-size:12px;color:var(--ink-secondary)">路径预计需要</div>
+              <div class="ledger-num">${esc(reqH)}</div>
+            </div>
+            <div class="ledger-box">
+              <div style="font-size:12px;color:var(--ink-secondary)">截止前你可用</div>
+              <div class="ledger-num">${esc(avH)}</div>
+            </div>
+            <div class="ledger-box">
+              <div style="font-size:12px;color:var(--ink-secondary)">工时差额</div>
+              <div class="ledger-num" style="color:${tb.surplus_hours != null && tb.surplus_hours < 0 ? 'var(--st-due)' : 'var(--st-verif)'}">${esc(diffH)}</div>
+            </div>
+          </div>
+          <div class="tier-grid">
+            ${tiers.map((t, idx) => `
+              <button class="tier-card ${idx === selectedTierIdx ? 'selected' : ''}" data-tier="${idx}">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+                  <strong style="font-size:13px">方案 ${idx + 1}</strong>
+                  ${idx === selectedTierIdx ? `<span class="badge b-verified">当前启用</span>` : ""}
+                </div>
+                <div style="font-size:12px;color:var(--ink-secondary)">${esc(t.label)}</div>
+              </button>
+            `).join("")}
+          </div>
+          ${M.stop_loss ? `<div style="margin-top:10px;font-size:12px;color:var(--st-due)"><strong>预设止损线：</strong>${esc(M.stop_loss)}</div>` : ""}
+          <div style="margin-top:12px;display:flex;justify-content:flex-end;gap:8px">
+            <button class="btn-ghost" id="ov-go-role">先看岗位任务链地图 →</button>
+            <button class="btn-cta" id="ov-go-dag">按此方案进入学习路线画布 →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-label"><span>C · 存量 · 缺口 · 首站最小闭环分流</span><span>不重复学已会的，不盲补零散概念</span></div>
+        <div class="grid-3" style="margin-bottom:0">
+          <div class="triage-col stock" style="padding-top:10px">
+            <div style="font-size:12px;color:var(--st-verif);font-weight:700">已掌握存量 · 可直接跳过（${(M.diag.stock||[]).length} 项）</div>
+            <ul class="triage-list">
+              ${(M.diag.stock && M.diag.stock.length) ? M.diag.stock.map(s => `<li>✅ ${esc(s)}</li>`).join("") : `<li style="color:var(--ink-muted)">已在 01-能力地图登记外部证据的条目自动归入此处跳过。</li>`}
+            </ul>
+          </div>
+          <div class="triage-col gaps" style="padding-top:10px">
+            <div style="font-size:12px;color:var(--st-due);font-weight:700">关键缺口 · 按重要性×差距排序（${(M.diag.gaps||[]).length} 项）</div>
+            <ul class="triage-list">
+              ${(M.diag.gaps && M.diag.gaps.length) ? M.diag.gaps.map(g => `<li style="cursor:pointer" data-jump-node="${esc(g)}">🎯 <strong>${esc(g)}</strong> <span style="color:var(--st-aipass);font-size:11px">↗ 去攻克</span></li>`).join("") : `<li style="color:var(--ink-muted)">完成阶段 3 诊断实测后自动按优先级排列。</li>`}
+            </ul>
+          </div>
+          <div class="triage-col first" style="padding-top:10px">
+            <div style="font-size:12px;color:var(--st-aipass);font-weight:700">建议先补 · 首站最小闭环（第 1 周优先）</div>
+            <ul class="triage-list">
+              ${M.first_loop ? `<li>🚀 <strong>${esc(M.first_loop)}</strong></li>` : ""}
+              ${(M.diag.first || []).filter(x => x !== M.first_loop).map(f => `<li>💡 ${esc(f)}</li>`).join("")}
+              ${(!M.first_loop && !(M.diag.first||[]).length) ? `<li style="color:var(--ink-muted)">先完整做出一件最小可验证成品，再回头补单点理论。</li>` : ""}
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+
+    el.querySelectorAll("[data-tier]").forEach(btn => btn.addEventListener("click", () => {
+      selectedTierIdx = Number(btn.dataset.tier);
+      renderOverview(curData());
+    }));
+    document.getElementById("ov-go-dag").addEventListener("click", () => switchView("roadmap"));
+    document.getElementById("ov-go-role").addEventListener("click", () => switchView("rolemap"));
+    el.querySelectorAll("[data-jump-node]").forEach(li => li.addEventListener("click", () => {
+      const kw = li.dataset.jumpNode.split(/[：:—-]/)[0].trim();
+      const hit = M.nodes.find(n => n.name.includes(kw) || kw.includes(n.name));
+      if (hit) selectedNodeName = hit.name;
+      switchView("roadmap");
+    }));
+  }
+
+  // ==================== VIEW 2: ROADMAP DAG CANVAS ====================
+  let dagPan = { x: 28, y: 24, scale: 1 };
+
+  function renderRoadmap(M) {
+    const el = document.getElementById("view-roadmap");
+    const nodes = M.nodes || [];
+    if (!nodes.length) {
+      el.innerHTML = `<div class="card"><h3>暂无路线节点</h3><p style="font-size:13px;color:var(--ink-secondary);margin-top:6px">请点击右上角「样例演示」体验完整有向连线画布，或在本地 <code>计划.md</code> 拆解条目后运行 <code>python learn_stats.py vault</code>。</p></div>`;
+      return;
+    }
+
+    const c = countStatuses(nodes);
+    const focusNode = nodes.find(n => n.status === "due_or_blocked")
+      || nodes.find(n => n.status === "practicing")
+      || nodes.find(n => n.status === "todo")
+      || nodes[0];
+
+    if (!selectedNodeName || !nodes.some(n => n.name === selectedNodeName)) {
+      selectedNodeName = focusNode.name;
+    }
+    const sel = nodes.find(n => n.name === selectedNodeName) || nodes[0];
+    const selMeta = ST_INFO[sel.status] || ST_INFO.todo;
+
+    // Group nodes into stage columns by module order
+    const stageOrder = [];
+    const stageMap = {};
+    nodes.forEach((n, idx) => {
+      const m = n.module || "阶段一 · 核心主线";
+      if (!stageMap[m]) { stageMap[m] = []; stageOrder.push(m); }
+      stageMap[m].push({ ...n, _idx: idx + 1 });
+    });
+
+    // Compute (x, y) coordinates for DAG canvas
+    const COL_W = 264, ROW_H = 122, TOP_Y = 46;
+    const posMap = {};
+    let maxColRows = 1;
+    stageOrder.forEach((m, ci) => {
+      maxColRows = Math.max(maxColRows, stageMap[m].length);
+      stageMap[m].forEach((n, ri) => {
+        posMap[n.name] = {
+          x: ci * COL_W,
+          y: TOP_Y + ri * ROW_H,
+          col: ci,
+          row: ri,
+          node: n
+        };
+      });
+    });
+
+    // Build edges: explicit prereqs if provided, else natural within-stage + cross-stage backbone flow
+    const edges = [];
+    stageOrder.forEach((m, ci) => {
+      const colNodes = stageMap[m];
+      for (let ri = 0; ri < colNodes.length; ri++) {
+        const cur = colNodes[ri];
+        const isOptional = (cur.importance || "").includes("低") || (cur.importance || "").includes("支线") || (cur.importance || "").includes("加分");
+        if (ri > 0) {
+          edges.push({ from: colNodes[ri - 1].name, to: cur.name, kind: isOptional ? "branch" : "main" });
+        }
+        if (ri === 0 && ci > 0) {
+          const prevCol = stageMap[stageOrder[ci - 1]];
+          const anchorPrev = prevCol[Math.min(1, prevCol.length - 1)];
+          edges.push({ from: anchorPrev.name, to: cur.name, kind: "main" });
+        }
+        if (ri === colNodes.length - 1 && ci < stageOrder.length - 1 && colNodes.length > 1) {
+          const nextCol = stageMap[stageOrder[ci + 1]];
+          if (nextCol.length > 1) {
+            edges.push({ from: cur.name, to: nextCol[nextCol.length - 1].name, kind: "review" });
+          }
+        }
+      }
+    });
+
+    const canvasW = Math.max(820, stageOrder.length * COL_W + 80);
+    const canvasH = Math.max(520, TOP_Y + maxColRows * ROW_H + 80);
+
+    const svgPaths = edges.map(e => {
+      const p1 = posMap[e.from], p2 = posMap[e.to];
+      if (!p1 || !p2) return "";
+      let x1, y1, x2, y2, d;
+      if (p1.col === p2.col) {
+        x1 = p1.x + 98; y1 = p1.y + 68;
+        x2 = p2.x + 98; y2 = p2.y;
+        d = `M ${x1} ${y1} L ${x2} ${y2}`;
+      } else {
+        x1 = p1.x + 196; y1 = p1.y + 34;
+        x2 = p2.x;       y2 = p2.y + 34;
+        const mx = (x1 + x2) / 2;
+        d = `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`;
+      }
+      const stroke = e.kind === "review" ? "var(--cta)" : (e.kind === "branch" ? "var(--ink-muted)" : "var(--brand)");
+      const dash = e.kind === "branch" ? "5,5" : (e.kind === "review" ? "3,3" : "");
+      return `<path class="dag-edge" data-from="${esc(e.from)}" data-to="${esc(e.to)}" d="${d}" fill="none" stroke="${stroke}" stroke-width="${e.kind==='main'?2:1.5}" ${dash ? `stroke-dasharray="${dash}"` : ""} opacity="0.65" />`;
+    }).join("");
+
+    const stageHdrHtml = stageOrder.map((m, ci) =>
+      `<div class="stage-col-hdr" style="left:${ci * COL_W}px;top:6px">${esc(m)}</div>`
+    ).join("");
+
+    const nodesHtml = Object.values(posMap).map(p => {
+      const n = p.node;
+      const st = ST_INFO[n.status] || ST_INFO.todo;
+      const filterDim = (roadmapFilter !== "all" && n.status !== roadmapFilter)
+        || (selectedTierIdx === 0 && ((n.importance || "").includes("低") || (n.importance || "").includes("加分")));
+      const minEst = n.est_hours ? Math.round(n.est_hours * 60) + " 分钟" : (n.ktype || "核心站");
+      return `<div class="dag-node ${st.nodeCls} ${n.name === selectedNodeName ? 'selected' : ''} ${filterDim ? 'dimmed' : ''}"
+                   style="left:${p.x}px;top:${p.y}px" data-node="${esc(n.name)}">
+        <div class="dn-top">
+          <span class="dn-idx">${n.status === 'verified' ? '✓' : n._idx}</span>
+          <span style="font-size:10px;font-weight:700">${esc(st.short)}</span>
+        </div>
+        <div class="dn-title">${esc(n.name)}</div>
+        <div class="dn-sub">
+          <span>${esc(minEst)}</span>
+          <span>${n.ext_count ? `真题 ${Math.round(n.ext_acc*100)}%` : (n.ai_count ? `AI练 ${Math.round(n.ai_acc*100)}%` : "待学")}</span>
+        </div>
+      </div>`;
+    }).join("");
+
+    // Submode: Week Plan or Table
+    let mainLeftHtml = "";
+    if (roadmapSubMode === "dag") {
+      mainLeftHtml = `
+        <div class="canvas-shell" id="dag-shell">
+          <div class="canvas-viewport" id="dag-vp" style="width:${canvasW}px;height:${canvasH}px;transform:translate(${dagPan.x}px,${dagPan.y}px) scale(${dagPan.scale})">
+            <svg width="${canvasW}" height="${canvasH}" style="position:absolute;top:0;left:0;pointer-events:none">${svgPaths}</svg>
+            ${stageHdrHtml}
+            ${nodesHtml}
+          </div>
+          <div class="canvas-legend">
+            <span>━━ 主线必做</span>
+            <span>┅┅ 支线/进阶</span>
+            <span>🟢 外部验证已掌握(${c.verified})</span>
+            <span>🔵 练习达标·待外部验证(${c.ai_passed})</span>
+            <span>🟡 练习中(${c.practicing})</span>
+            <span>🟠 到期/盲区(${c.due_or_blocked})</span>
+          </div>
+          <div class="canvas-ZoomCtrl">
+            <button class="zoom-btn" id="z-in">+</button>
+            <button class="zoom-btn" id="z-out">−</button>
+            <button class="zoom-btn" id="z-reset" title="重置视图">⊙</button>
+          </div>
+        </div>
+      `;
+    } else if (roadmapSubMode === "week") {
+      mainLeftHtml = `<div class="card">
+        <div class="sec-label"><span>按阶段周计划排期</span><span>先跑通首站闭环，每周保留外部检验</span></div>
+        ${stageOrder.map((m, i) => `
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px dashed var(--line)">
+            <div style="font-weight:700;font-size:14px;margin-bottom:8px">第 ${i + 1} 阶段 · ${esc(m)}</div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+              ${stageMap[m].map(n => `<div class="card" style="padding:10px 12px;cursor:pointer;border-color:${n.name===selectedNodeName?'var(--cta)':'var(--line)'}" data-node="${esc(n.name)}">
+                <div style="display:flex;justify-content:space-between;gap:6px"><strong style="font-size:13px">${esc(n.name)}</strong><span class="badge ${ST_INFO[n.status].badgeCls}">${ST_INFO[n.status].short}</span></div>
+                <div style="font-size:11px;color:var(--ink-secondary);margin-top:4px">类型：${esc(n.ktype||"-")} ｜ 预计 ${n.est_hours ? n.est_hours + 'h' : '0.5h'}</div>
+              </div>`).join("")}
+            </div>
+          </div>
+        `).join("")}
+      </div>`;
+    } else {
+      mainLeftHtml = `<div class="card">
+        <table class="compact">
+          <tr><th>#</th><th>条目（动词+对象+标准）</th><th>模块</th><th>状态</th><th>AI练习</th><th>外部真题/交付</th></tr>
+          ${nodes.map((n, idx) => `<tr style="cursor:pointer;${n.name===selectedNodeName?'background:var(--brand-soft)':''}" data-node="${esc(n.name)}">
+            <td>${idx + 1}</td>
+            <td><strong>${esc(n.name)}</strong></td>
+            <td>${esc(n.module)}</td>
+            <td><span class="badge ${ST_INFO[n.status].badgeCls}">${ST_INFO[n.status].label}</span></td>
+            <td>${n.ai_acc != null ? Math.round(n.ai_acc*100)+'% ('+n.ai_count+')' : '-'}</td>
+            <td>${n.ext_acc != null ? Math.round(n.ext_acc*100)+'% ('+n.ext_count+')' : '-'}</td>
+          </tr>`).join("")}
+        </table>
+      </div>`;
+    }
+
+    // Right Drawer for Selected Station
+    const rb = sel.rubric || {};
+    const hasRb = rb["优秀"] || rb["达标"] || rb["入门"] || rb["未达"];
+    const ask1 = `我正在攻克「${sel.name}」：请先给我 1 个达标正例和 1 个新手最常翻车的反例，不要长篇大论，讲完出一道小练习等我独立作答。`;
+    const ask2 = `在真实工作/考试里，「${sel.name}」在什么边界条件下常规做法会失效？请附可查证来源标注[原文]/[归纳]。`;
+    const ask3 = `请按「${sel.name}」的达标特征出一道变式盲测题；在我先报 0-100 把握度并交出自己的答案前，绝不要给参考答案。`;
+
+    el.innerHTML = `
+      <div class="roadmap-bar">
+        <div class="today-pill">
+          <span class="today-tag">TODAY 今日焦点</span>
+          <span><strong>${esc(focusNode.name)}</strong></span>
+          <button class="btn-cta" style="padding:5px 12px;font-size:12px" id="btn-focus-today">定位今日站</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <select id="rm-filter" style="padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface-subtle);font-size:12px">
+            <option value="all" ${roadmapFilter==='all'?'selected':''}>全部状态 (${nodes.length})</option>
+            <option value="due_or_blocked" ${roadmapFilter==='due_or_blocked'?'selected':''}>🟠 到期/高估盲区 (${c.due_or_blocked})</option>
+            <option value="practicing" ${roadmapFilter==='practicing'?'selected':''}>🟡 练习中 (${c.practicing})</option>
+            <option value="ai_passed" ${roadmapFilter==='ai_passed'?'selected':''}>🔵 待外部验证 (${c.ai_passed})</option>
+            <option value="verified" ${roadmapFilter==='verified'?'selected':''}>🟢 外部已证 (${c.verified})</option>
+            <option value="todo" ${roadmapFilter==='todo'?'selected':''}>⚪ 未开始 (${c.todo})</option>
+          </select>
+          <button class="btn-ghost ${roadmapSubMode==='dag'?'active':''}" data-sub="dag">地图画布</button>
+          <button class="btn-ghost ${roadmapSubMode==='week'?'active':''}" data-sub="week">周计划</button>
+          <button class="btn-ghost ${roadmapSubMode==='table'?'active':''}" data-sub="table">清单</button>
+        </div>
+      </div>
+
+      <div class="workspace-split">
+        <div>${mainLeftHtml}</div>
+
+        <aside class="drawer-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div>
+              <div style="font-size:11px;color:var(--ink-secondary)">${esc(sel.module || "学习站点")} · ${esc(sel.ktype || "综合能力")}</div>
+              <h3 style="font-size:16px;margin-top:2px">${esc(sel.name)}</h3>
+            </div>
+            <span class="badge ${selMeta.badgeCls}">${selMeta.label}</span>
+          </div>
+
+          ${sel.status === "ai_passed" ? `<div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:var(--st-aipass-bg);color:var(--st-aipass);font-size:12px">
+            <strong>防自嗨提醒：</strong>本站 AI 练习已达标，但尚未通过外部真题或真实交付验证，暂不点亮绿色「已学会」。
+          </div>` : ""}
+          ${sel.high_conf_err ? `<div style="margin-top:10px;padding:8px 10px;border-radius:6px;background:var(--st-due-bg);color:var(--st-due);font-size:12px">
+            <strong>元认知盲区预警：</strong>近期出现把握度 ≥75% 却答错，说明存在概念误解，请先核对下方标准！
+          </div>` : ""}
+
+          <div class="drawer-sec">
+            <h4>分级评价标准（看得见的特征）</h4>
+            ${hasRb ? `<table class="compact">
+              <tr><th style="width:48px">档位</th><th>可核验特征</th></tr>
+              <tr><td><strong>优秀</strong></td><td>${esc(rb["优秀"] || "-")}</td></tr>
+              <tr><td><strong>达标</strong></td><td>${esc(rb["达标"] || "-")}</td></tr>
+              <tr><td>入门</td><td>${esc(rb["入门"] || "-")}</td></tr>
+              <tr><td>未达</td><td>${esc(rb["未达"] || "-")}</td></tr>
+            </table>` : `<p style="font-size:12px;color:var(--ink-muted)">在 <code>评价标准.md</code> 中补齐本站可见特征。</p>`}
+          </div>
+
+          <div class="drawer-sec">
+            <h4>引导追问（不知道问什么？点一下复制给良师 AI）</h4>
+            <button class="ask-chip" data-ask="${esc(ask1)}">💡 <strong>正反例辨析：</strong>给我 1 正 1 反典型案例 + 微练习</button>
+            <button class="ask-chip" data-ask="${esc(ask2)}">🔍 <strong>边界与失效条件：</strong>老手避坑点与何时常规方法失效</button>
+            <button class="ask-chip" data-ask="${esc(ask3)}">🎯 <strong>变式盲测题：</strong>先报把握度独立作答，禁提前给答案</button>
+          </div>
+
+          <div class="drawer-sec">
+            <h4>站内闯关记录台（提交后实时更新画布节点颜色）</h4>
+            <div class="field">
+              <label>第一步：作答前先报把握度 <strong id="d-conf-lbl">75%</strong></label>
+              <input type="range" id="d-conf" min="0" max="100" step="5" value="75" style="width:100%">
+            </div>
+            <div class="field">
+              <input type="text" id="d-q" placeholder="练习题或微任务简述（如：剪除60秒口播气口）">
+            </div>
+            <div class="field">
+              <input type="text" id="d-ans" placeholder="我的独立作答关键思路/结果">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+              <select id="d-res"><option value="对">结果：对</option><option value="部分">结果：部分</option><option value="错">结果：错</option></select>
+              <select id="d-src"><option value="AI出题">AI出题(封顶🔵)</option><option value="真题">未见真题(可升🟢)</option><option value="实际交付">实际交付/盲评(可升🟢)</option></select>
+              <select id="d-err"><option value="">全对无错因</option><option value="概念不懂">概念不懂</option><option value="步骤错">步骤错</option><option value="没读清题">没读清题</option><option value="粗心">粗心</option><option value="会但说不清">会但说不清</option><option value="迁移失败">迁移失败</option></select>
+            </div>
+            <button class="btn-primary" id="d-submit" style="width:100%">记录本次实测并刷新状态</button>
+          </div>
+
+          ${sel.recent && sel.recent.length ? `<div class="drawer-sec">
+            <h4>最近实测记录（共 ${sel.recent.length} 条）</h4>
+            <table class="compact">
+              <tr><th>来源</th><th>把握度</th><th>结果</th><th>备注</th></tr>
+              ${sel.recent.slice().reverse().map(r => `<tr>
+                <td>${esc(r.src)}</td>
+                <td>${r.conf != null ? r.conf + '%' : '-'}</td>
+                <td><strong>${esc(r.res)}</strong></td>
+                <td>${esc([r.err, r.q].filter(Boolean).join(" · "))}</td>
+              </tr>`).join("")}
+            </table>
+          </div>` : ""}
+        </aside>
+      </div>
+    `;
+
+    document.getElementById("btn-focus-today").addEventListener("click", () => {
+      selectedNodeName = focusNode.name;
+      renderRoadmap(curData());
+    });
+    document.getElementById("rm-filter").addEventListener("change", e => {
+      roadmapFilter = e.target.value;
+      renderRoadmap(curData());
+    });
+    el.querySelectorAll("[data-sub]").forEach(b => b.addEventListener("click", () => {
+      roadmapSubMode = b.dataset.sub;
+      renderRoadmap(curData());
+    }));
+    el.querySelectorAll("[data-node]").forEach(nd => {
+      nd.addEventListener("click", e => {
+        e.stopPropagation();
+        selectedNodeName = nd.dataset.node;
+        renderRoadmap(curData());
+      });
+      nd.addEventListener("mouseenter", () => {
+        const nm = nd.dataset.node;
+        el.querySelectorAll(".dag-edge").forEach(p => {
+          const hit = (p.dataset.from === nm || p.dataset.to === nm);
+          p.setAttribute("opacity", hit ? "1" : "0.18");
+          if (hit) p.setAttribute("stroke-width", "3");
+        });
+      });
+      nd.addEventListener("mouseleave", () => {
+        el.querySelectorAll(".dag-edge").forEach(p => {
+          p.setAttribute("opacity", "0.65");
+          p.setAttribute("stroke-width", "2");
+        });
+      });
+    });
+
+    // Pan & Zoom on DAG canvas
+    const shell = document.getElementById("dag-shell");
+    const vp = document.getElementById("dag-vp");
+    if (shell && vp) {
+      let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+      const applyTf = () => { vp.style.transform = `translate(${dagPan.x}px,${dagPan.y}px) scale(${dagPan.scale})`; };
+      shell.addEventListener("mousedown", e => {
+        if (e.target.closest(".dag-node") || e.target.closest(".zoom-btn")) return;
+        dragging = true; sx = e.clientX; sy = e.clientY; ox = dagPan.x; oy = dagPan.y;
+      });
+      window.addEventListener("mousemove", e => {
+        if (!dragging) return;
+        dagPan.x = ox + (e.clientX - sx);
+        dagPan.y = oy + (e.clientY - sy);
+        applyTf();
+      });
+      window.addEventListener("mouseup", () => { dragging = false; });
+      shell.addEventListener("wheel", e => {
+        e.preventDefault();
+        const delta = e.deltaY < 0 ? 0.08 : -0.08;
+        dagPan.scale = Math.min(1.6, Math.max(0.55, dagPan.scale + delta));
+        applyTf();
+      }, { passive: false });
+      document.getElementById("z-in").addEventListener("click", () => { dagPan.scale = Math.min(1.6, dagPan.scale + 0.15); applyTf(); });
+      document.getElementById("z-out").addEventListener("click", () => { dagPan.scale = Math.max(0.55, dagPan.scale - 0.15); applyTf(); });
+      document.getElementById("z-reset").addEventListener("click", () => { dagPan = { x: 28, y: 24, scale: 1 }; applyTf(); });
+    }
+
+    el.querySelectorAll("[data-ask]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.ask, "追问指令已复制")));
+    const confSlider = document.getElementById("d-conf");
+    if (confSlider) confSlider.addEventListener("input", () => { document.getElementById("d-conf-lbl").textContent = confSlider.value + "%"; });
+
+    document.getElementById("d-submit").addEventListener("click", () => {
+      const q = document.getElementById("d-q").value.trim() || "站点自测";
+      const ans = document.getElementById("d-ans").value.trim() || "独立完成作答";
+      const res = document.getElementById("d-res").value;
+      const src = document.getElementById("d-src").value;
+      const err = res === "对" ? "" : document.getElementById("d-err").value;
+      const conf = document.getElementById("d-conf").value;
+      const drafts = getDrafts();
+      drafts.push({
+        date: new Date().toISOString().slice(0, 10),
+        goal: M.goal_id || M.goal_name || "",
+        item: sel.name,
+        q, ans, res, conf, err, src
+      });
+      setDrafts(drafts);
+      if (src === "AI出题" && res === "对") {
+        toast("已记录！注意：AI出题封顶为🔵待外部验证，真题/实际交付达标才点亮🟢");
+      } else {
+        toast("实测记录已保存，路线图状态已实时刷新！");
+      }
+      renderAll();
+    });
+  }
+
+  // ==================== VIEW 3: RADIAL ROLE NETWORK GRAPH ====================
+  let roleZoom = { x: 0, y: 0, scale: 1 };
+  const CLUSTER_PALETTE = ["#2B6CB0", "#2F855A", "#B7791F", "#9B2C2C", "#6B46C1", "#0987A0"];
+
+  function renderRoleMap(M) {
+    const el = document.getElementById("view-rolemap");
+    const rm = M.role_map;
+    if (!rm || !rm.modules || !rm.modules.length) {
+      el.innerHTML = `<div class="card">
+        <h3>尚未配置当前目标的岗位任务链地图（<code>岗位地图.json</code>）</h3>
+        <p style="font-size:13px;color:var(--ink-secondary);margin-top:6px">
+          点击右上角「样例演示」可立即体验六瓣中心辐射岗位关系网图谱；求职转岗时把真实招聘原文交给 AI 生成 <code>岗位地图.json</code>，即可联动查看「模块 → 动作链 → 输入/产出 → 对接角色 → 能力项」。
+        </p>
+      </div>`;
+      return;
+    }
+
+    // Build radial graph nodes & edges
+    const CX = 410, CY = 305;
+    const gNodes = [];
+    const gEdges = [];
+    const skillNodesMap = {};
+
+    gNodes.push({ id: "root", type: "root", label: rm.role_name || "目标岗位", x: CX, y: CY, r: 34, color: "var(--ink)" });
+
+    const mods = rm.modules || [];
+    const entryTasks = [];
+
+    mods.forEach((mod, mi) => {
+      const mAngle = (2 * Math.PI * mi) / Math.max(1, mods.length) - Math.PI / 2;
+      const mx = CX + Math.cos(mAngle) * 126;
+      const my = CY + Math.sin(mAngle) * 126;
+      const mColor = CLUSTER_PALETTE[mi % CLUSTER_PALETTE.length];
+      const modId = "mod_" + mi;
+      gNodes.push({ id: modId, type: "module", label: mod.name, x: mx, y: my, r: 24, color: mColor, raw: mod });
+      gEdges.push({ from: "root", to: modId, kind: "hier", color: mColor });
+
+      const tasks = mod.tasks || [];
+      tasks.forEach((t, ti) => {
+        if (entryTasks.length < 3) entryTasks.push(t);
+        const spread = Math.min(0.9, tasks.length * 0.28);
+        const offset = tasks.length === 1 ? 0 : (-spread / 2 + (spread * ti) / (tasks.length - 1));
+        const tAngle = mAngle + offset;
+        const tx = CX + Math.cos(tAngle) * 218;
+        const ty = CY + Math.sin(tAngle) * 218;
+        const tId = `task_${mi}_${ti}`;
+        gNodes.push({ id: tId, type: "task", label: t.name, x: tx, y: ty, r: 14, color: mColor, raw: { ...t, modName: mod.name } });
+        gEdges.push({ from: modId, to: tId, kind: "hier", color: mColor });
+
+        (t.skills || []).forEach((sk, si) => {
+          let skId = skillNodesMap[sk];
+          if (!skId) {
+            skId = "sk_" + Object.keys(skillNodesMap).length;
+            skillNodesMap[sk] = skId;
+            const sAngle = tAngle + (si - 0.3) * 0.16;
+            const sx = CX + Math.cos(sAngle) * 282;
+            const sy = CY + Math.sin(sAngle) * 282;
+            const linkedRoadmapNode = (M.nodes || []).find(n => n.name === sk || n.name.includes(sk) || sk.includes(n.name));
+            gNodes.push({
+              id: skId,
+              type: "skill",
+              label: sk,
+              x: sx, y: sy, r: 9,
+              color: linkedRoadmapNode && linkedRoadmapNode.status === "verified" ? "#1B6B45" : "#1B5C8A",
+              raw: { name: sk, tasks: [t], tools: t.tools || [], linked: linkedRoadmapNode }
+            });
+          } else {
+            const exist = gNodes.find(x => x.id === skId);
+            if (exist && !exist.raw.tasks.includes(t)) exist.raw.tasks.push(t);
+          }
+          gEdges.push({ from: tId, to: skId, kind: "skill", color: "#6B8EAD" });
+        });
+      });
+    });
+
+    if (!selectedRoleItem) {
+      const firstTask = gNodes.find(n => n.type === "task");
+      selectedRoleItem = firstTask || gNodes[0];
+    } else {
+      const refreshed = gNodes.find(n => n.id === selectedRoleItem.id);
+      if (refreshed) selectedRoleItem = refreshed;
+    }
+
+    const sal = rm.salary_range_k || {};
+    const hasSal = sal.low != null || sal.mid != null || sal.high != null;
+    const sampleNote = rm.is_verified_sample && rm.sample_count
+      ? `真实采集 ${rm.sample_count} 份招聘原文（${rm.collected_at || "已归档"}）`
+      : "示例结构化框架（未做真实 JD 统计，避免伪造行情）";
+
+    // Filter search match
+    const kw = roleSearch.trim().toLowerCase();
+
+    const svgEdgesHtml = gEdges.map(e => {
+      const a = gNodes.find(n => n.id === e.from), b = gNodes.find(n => n.id === e.to);
+      if (!a || !b) return "";
+      return `<line class="rg-edge" data-from="${a.id}" data-to="${b.id}"
+                x1="${a.x.toFixed(1)}" y1="${a.y.toFixed(1)}" x2="${b.x.toFixed(1)}" y2="${b.y.toFixed(1)}"
+                stroke="${e.color}" stroke-width="${e.kind==='hier'?1.8:1.2}"
+                ${e.kind==='skill' ? 'stroke-dasharray="4,4"' : ''} opacity="0.45" />`;
+    }).join("");
+
+    const svgNodesHtml = gNodes.map(n => {
+      const hitSearch = !kw || n.label.toLowerCase().includes(kw);
+      const isSel = selectedRoleItem && selectedRoleItem.id === n.id;
+      const fillOp = n.type === "module" ? "0.18" : (n.type === "root" ? "0.08" : "0.14");
+      const fontSize = n.type === "root" ? 13 : (n.type === "module" ? 12 : 11);
+      const dispLbl = (n.type === "task" || n.type === "skill") && n.label.length > 8 ? n.label.slice(0, 8) + "…" : n.label;
+      return `<g class="rg-node" data-id="${n.id}" style="cursor:pointer;opacity:${hitSearch ? 1 : 0.2}">
+        <circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${isSel ? n.r + 4 : n.r}"
+                fill="${n.color}" fill-opacity="${fillOp}" stroke="${n.color}" stroke-width="${isSel ? 3 : 1.8}" />
+        <text x="${n.x.toFixed(1)}" y="${(n.y + (n.type==='root' || n.type==='module' ? 4 : n.r + 13)).toFixed(1)}"
+              text-anchor="middle" font-size="${fontSize}" font-weight="${n.type==='skill'?500:700}"
+              fill="var(--ink)">${esc(dispLbl)}</text>
+      </g>`;
+    }).join("");
+
+    // Right drawer content
+    let rightHtml = "";
+    const sel = selectedRoleItem;
+    if (sel.type === "task") {
+      const t = sel.raw;
+      rightHtml = `
+        <div style="font-size:11px;color:var(--st-aipass);font-weight:700">● 具体岗位任务 · ${esc(t.modName)}</div>
+        <h3 style="font-size:17px;margin:3px 0 4px">${esc(t.name)}</h3>
+        <div style="font-size:12px;color:var(--ink-secondary)">出现频次：${esc(t.frequency || "常规")} ｜ 岗位权重：${t.weight ?? "-"} / 10</div>
+
+        <div class="drawer-sec">
+          <h4>工作模式：一条标准动作链</h4>
+          ${(t.chain || []).map((step, idx) => `<div class="chain-item"><span class="chain-num">0${idx+1}</span><span>${esc(step.replace(/^0\d\s*/, ""))}</span></div>`).join("")}
+        </div>
+
+        <div class="drawer-sec">
+          <h4>输入 / 产出物（作品集验收锚点）</h4>
+          <div class="io-grid">
+            <div class="io-box"><div style="color:var(--ink-muted);font-size:11px">吃进什么（输入）</div><strong>${esc(t.input || "-")}</strong></div>
+            <div class="io-box"><div style="color:var(--ink-muted);font-size:11px">吐出什么（产出）</div><strong>${esc(t.output || "-")}</strong></div>
+          </div>
+          <div style="font-size:12px;margin-top:6px"><strong>对接角色：</strong>${esc(t.collaborators || "独立完成")}</div>
+          <div style="font-size:12px;margin-top:4px"><strong>常用工具：</strong>${esc((t.tools || []).join(" / ") || "-")}</div>
+        </div>
+
+        ${t.jd_quote ? `<div class="drawer-sec"><h4>招聘原文 / 验收依据</h4><p style="font-size:12px;color:var(--ink-secondary);font-style:italic">"${esc(t.jd_quote)}"</p></div>` : ""}
+
+        <div class="drawer-sec">
+          <h4>关联能力项（点击直接联动到「② 证据路线画布」开练）</h4>
+          <div>
+            ${(t.skills || []).map(sk => `<button class="pill-link" data-goto-skill="${esc(sk)}">↗ 去路线图练：${esc(sk)}</button>`).join("") || `<span style="font-size:12px;color:var(--ink-muted)">未绑定能力项</span>`}
+          </div>
+        </div>
+      `;
+    } else if (sel.type === "skill") {
+      const s = sel.raw;
+      const stBadge = s.linked ? `<span class="badge ${ST_INFO[s.linked.status].badgeCls}">${ST_INFO[s.linked.status].label}</span>` : `<span class="badge b-todo">未建站</span>`;
+      rightHtml = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:11px;color:var(--brand);font-weight:700">● 岗位底层能力项</span>
+          ${stBadge}
+        </div>
+        <h3 style="font-size:17px;margin:4px 0 8px">${esc(sel.label)}</h3>
+        <div class="drawer-sec">
+          <h4>挂在这条能力上的真实工作任务（${s.tasks.length} 项）</h4>
+          ${s.tasks.map(t => `<div class="chain-item"><span>📌 <strong>${esc(t.name)}</strong> → 交付：${esc(t.output)}</span></div>`).join("")}
+        </div>
+        <div class="drawer-sec">
+          <button class="btn-cta" style="width:100%" data-goto-skill="${esc(sel.label)}">进入路线画布训练此能力 →</button>
+        </div>
+      `;
+    } else {
+      rightHtml = `
+        <div style="font-size:11px;color:var(--ink-secondary);font-weight:700">● 职能板块概览</div>
+        <h3 style="font-size:17px;margin:4px 0 8px">${esc(sel.label)}</h3>
+        <p style="font-size:13px;color:var(--ink-secondary)">点击画布外圈的具体「任务圆点」或「能力节点」，查看详细工作动作链、输入产出物，并一键联动到学习路线。</p>
+      `;
+    }
+
+    const centerContent = roleSubMode === "graph" ? `
+      <div class="canvas-shell" id="rg-shell">
+        <div style="position:absolute;top:10px;left:12px;right:12px;z-index:10;display:flex;justify-content:space-between;gap:8px;pointer-events:none">
+          <div style="background:var(--surface);border:1px solid var(--line);padding:4px 10px;border-radius:6px;font-size:12px;pointer-events:auto">
+            <strong>全景网状图</strong> <span style="color:var(--ink-secondary)">· 悬停任一节点高亮上下游链路，单击锁定右侧详情</span>
+          </div>
+          <div style="display:flex;gap:6px;pointer-events:auto">
+            <input type="text" id="rg-search" value="${esc(roleSearch)}" placeholder="搜索任务 / 能力..." style="padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);font-size:12px;width:150px">
+            <button class="btn-ghost" id="rg-to-list">切列表视图</button>
+          </div>
+        </div>
+        <div class="canvas-viewport" id="rg-vp" style="width:820px;height:610px;transform:translate(${roleZoom.x}px,${roleZoom.y}px) scale(${roleZoom.scale})">
+          <svg width="820" height="610">${svgEdgesHtml}${svgNodesHtml}</svg>
+        </div>
+        <div class="graph-tooltip" id="rg-tip"></div>
+        <div class="canvas-legend">
+          <span>━━ 职能包含关系</span>
+          <span>┅┅ 能力调用关系</span>
+          <span>● 内圈：职能域 ｜ 中圈：工作任务 ｜ 外圈：能力项</span>
+        </div>
+      </div>
+    ` : `
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <strong>岗位任务与产出物清单</strong>
+          <button class="btn-ghost" id="rg-to-graph">切回全景网状图</button>
+        </div>
+        <table class="compact">
+          <tr><th>模块</th><th>具体任务</th><th>吃进输入 → 吐出产出</th><th>需要能力</th></tr>
+          ${mods.map((m, mi) => (m.tasks||[]).map((t, ti) => `<tr style="cursor:pointer" data-pick-task="task_${mi}_${ti}">
+            <td>${esc(m.name)}</td>
+            <td><strong>${esc(t.name)}</strong></td>
+            <td>${esc(t.input)} → <strong>${esc(t.output)}</strong></td>
+            <td>${esc((t.skills||[]).join("、"))}</td>
+          </tr>`).join("")).join("")}
+        </table>
+      </div>
+    `;
+
+    el.innerHTML = `
+      <div class="role-studio">
+        <div class="card">
+          <div style="font-size:11px;color:var(--ink-muted)">— 岗位名片</div>
+          <h2 style="font-size:20px;margin:4px 0">${esc(rm.role_name)}</h2>
+          <div style="font-size:12px;color:var(--ink-secondary);margin-bottom:10px">${esc(rm.industry_city_level || "")}</div>
+          <p style="font-size:12px;padding-left:8px;border-left:2px solid var(--brand);margin-bottom:14px">${esc(rm.summary || "")}</p>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;padding:10px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+            <div><div style="color:var(--ink-muted)">图谱节点</div><strong>${gNodes.length}</strong></div>
+            <div><div style="color:var(--ink-muted)">关联连线</div><strong>${gEdges.length}</strong></div>
+            <div style="grid-column:span 2"><div style="color:var(--ink-muted)">数据性质（防伪造声明）</div><strong style="color:${rm.is_verified_sample?'var(--st-verif)':'var(--st-prac)'}">${esc(sampleNote)}</strong></div>
+          </div>
+
+          <div style="margin-top:12px">
+            <div style="font-size:11px;color:var(--ink-muted);margin-bottom:4px">月度薪资三段参考</div>
+            ${hasSal ? `<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700"><span>${sal.low}K</span><span>${sal.mid}K</span><span>${sal.high}K</span></div>
+              <div style="height:5px;border-radius:3px;background:var(--st-prac-bg);margin:4px 0"><div style="width:65%;height:100%;background:var(--st-prac);border-radius:3px"></div></div>`
+              : `<div style="font-size:12px;color:var(--ink-muted)">待采集真实招聘原文后自动生成</div>`}
+          </div>
+
+          <div style="margin-top:14px;padding-top:10px;border-top:1px solid var(--line)">
+            <div style="font-size:11px;color:var(--ink-muted);margin-bottom:6px">三个新手优先入口任务</div>
+            ${entryTasks.map((t, i) => `<div style="font-size:12px;margin-bottom:4px"><strong>0${i+1}</strong> ${esc(t.name)}</div>`).join("")}
+          </div>
+        </div>
+
+        <div>${centerContent}</div>
+
+        <aside class="drawer-card">${rightHtml}</aside>
+      </div>
+    `;
+
+    // Interactions on Radial Graph
+    const searchInput = document.getElementById("rg-search");
+    if (searchInput) {
+      searchInput.addEventListener("input", e => {
+        roleSearch = e.target.value;
+        renderRoleMap(curData());
+        const ni = document.getElementById("rg-search");
+        if (ni) { ni.focus(); ni.setSelectionRange(ni.value.length, ni.value.length); }
+      });
+    }
+    const toListBtn = document.getElementById("rg-to-list");
+    if (toListBtn) toListBtn.addEventListener("click", () => { roleSubMode = "list"; renderRoleMap(curData()); });
+    const toGraphBtn = document.getElementById("rg-to-graph");
+    if (toGraphBtn) toGraphBtn.addEventListener("click", () => { roleSubMode = "graph"; renderRoleMap(curData()); });
+
+    el.querySelectorAll("[data-pick-task]").forEach(tr => tr.addEventListener("click", () => {
+      const id = tr.dataset.pickTask;
+      const found = gNodes.find(n => n.id === id);
+      if (found) selectedRoleItem = found;
+      renderRoleMap(curData());
+    }));
+
+    const tip = document.getElementById("rg-tip");
+    el.querySelectorAll(".rg-node").forEach(gn => {
+      gn.addEventListener("click", e => {
+        e.stopPropagation();
+        const found = gNodes.find(n => n.id === gn.dataset.id);
+        if (found) { selectedRoleItem = found; renderRoleMap(curData()); }
+      });
+      gn.addEventListener("mouseenter", e => {
+        const id = gn.dataset.id;
+        const connected = new Set([id]);
+        el.querySelectorAll(".rg-edge").forEach(ln => {
+          const f = ln.dataset.from, t = ln.dataset.to;
+          if (f === id || t === id) {
+            connected.add(f); connected.add(t);
+            ln.setAttribute("opacity", "1");
+            ln.setAttribute("stroke-width", "2.8");
+          } else {
+            ln.setAttribute("opacity", "0.08");
+          }
+        });
+        el.querySelectorAll(".rg-node").forEach(other => {
+          other.style.opacity = connected.has(other.dataset.id) ? "1" : "0.18";
+        });
+        const nd = gNodes.find(n => n.id === id);
+        if (tip && nd && nd.type === "task") {
+          tip.innerHTML = `<strong>${esc(nd.label)}</strong><br><span style="color:var(--ink-secondary)">输入：${esc(nd.raw.input || "-")} → 产出：${esc(nd.raw.output || "-")}</span>`;
+          tip.style.display = "block";
+          tip.style.left = Math.min(540, nd.x + 18) + "px";
+          tip.style.top = Math.max(48, nd.y - 12) + "px";
+        }
+      });
+      gn.addEventListener("mouseleave", () => {
+        el.querySelectorAll(".rg-edge").forEach(ln => {
+          ln.setAttribute("opacity", "0.45");
+          ln.setAttribute("stroke-width", "1.5");
+        });
+        el.querySelectorAll(".rg-node").forEach(other => { other.style.opacity = "1"; });
+        if (tip) tip.style.display = "none";
+      });
+    });
+
+    const rgShell = document.getElementById("rg-shell");
+    const rgVp = document.getElementById("rg-vp");
+    if (rgShell && rgVp) {
+      let drag = false, sx = 0, sy = 0, ox = 0, oy = 0;
+      const applyRg = () => { rgVp.style.transform = `translate(${roleZoom.x}px,${roleZoom.y}px) scale(${roleZoom.scale})`; };
+      rgShell.addEventListener("mousedown", e => {
+        if (e.target.closest(".rg-node") || e.target.closest("input") || e.target.closest("button")) return;
+        drag = true; sx = e.clientX; sy = e.clientY; ox = roleZoom.x; oy = roleZoom.y;
+      });
+      window.addEventListener("mousemove", e => {
+        if (!drag) return;
+        roleZoom.x = ox + (e.clientX - sx); roleZoom.y = oy + (e.clientY - sy); applyRg();
+      });
+      window.addEventListener("mouseup", () => { drag = false; });
+      rgShell.addEventListener("wheel", e => {
+        e.preventDefault();
+        roleZoom.scale = Math.min(1.6, Math.max(0.65, roleZoom.scale + (e.deltaY < 0 ? 0.08 : -0.08)));
+        applyRg();
+      }, { passive: false });
+    }
+
+    el.querySelectorAll("[data-goto-skill]").forEach(btn => btn.addEventListener("click", () => {
+      const sk = btn.dataset.gotoSkill;
+      const match = (M.nodes || []).find(n => n.name === sk || n.name.includes(sk) || sk.includes(n.name));
+      if (match) {
+        selectedNodeName = match.name;
+        roadmapFilter = "all";
+        switchView("roadmap");
+        toast("已联动定位到学习节点：" + match.name);
+      } else {
+        copyText(`请把岗位任务所需能力「${sk}」加入我的阶段 1 学习计划与分级评价标准中。`, "该能力尚未建站，已复制补建指令");
+      }
+    }));
+  }
+
+  // ==================== VIEW 4: WEEKLY REVIEW & 4D SVG RADAR ====================
+  function buildRadarSvg(dims) {
+    const S = 260, C = 130, R = 86;
+    const ptsFor = vals => vals.map((v, i) => {
+      const ang = -Math.PI / 2 + (i * Math.PI) / 2;
+      const r = (Math.max(0, Math.min(5, v)) / 5) * R;
+      return `${(C + Math.cos(ang) * r).toFixed(1)},${(C + Math.sin(ang) * r).toFixed(1)}`;
+    }).join(" ");
+
+    const rings = [1, 2, 3, 4, 5].map(lv =>
+      `<polygon points="${ptsFor([lv, lv, lv, lv])}" fill="none" stroke="var(--line)" stroke-width="1" />`
+    ).join("");
+
+    const axes = [0, 1, 2, 3].map(i => {
+      const ang = -Math.PI / 2 + (i * Math.PI) / 2;
+      const x = C + Math.cos(ang) * R, y = C + Math.sin(ang) * R;
+      const lx = C + Math.cos(ang) * (R + 24), ly = C + Math.sin(ang) * (R + 18);
+      const nm = dims[i] ? dims[i].name : "";
+      return `<line x1="${C}" y1="${C}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="var(--line)" />
+              <text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="12" fill="var(--ink-secondary)" font-weight="600">${esc(nm)}</text>`;
+    }).join("");
+
+    const curVals = [0, 1, 2, 3].map(i => (dims[i] && dims[i].score != null) ? dims[i].score : 2.0);
+    const baseVals = curVals.map(v => Math.max(1, v - 0.8));
+
+    return `<svg width="${S}" height="${S}" viewBox="0 0 ${S} ${S}" style="display:block;margin:0 auto">
+      ${rings}${axes}
+      <polygon points="${ptsFor(baseVals)}" fill="none" stroke="var(--ink-muted)" stroke-width="1.5" stroke-dasharray="4,4" />
+      <polygon points="${ptsFor(curVals)}" fill="var(--brand)" fill-opacity="0.2" stroke="var(--brand)" stroke-width="2.4" />
+    </svg>`;
+  }
+
+  function renderReview(M) {
+    const el = document.getElementById("view-review");
+    const c = countStatuses(M.nodes);
+    const total = M.nodes.length || 1;
+    const cal = M.calibration || {};
+
+    const doneTxt = (M.recent_sessions && M.recent_sessions.length)
+      ? M.recent_sessions.map(s => `${s.date}（${s.mins}分钟）：${s.done}`).join("；")
+      : `已完成 ${M.total_attempts} 次实测记录，其中外部验证已掌握 ${c.verified} 站，练习通过待外部验证 ${c.ai_passed} 站。`;
+
+    const stuckArr = [];
+    if (M.due && M.due.length) stuckArr.push(`${M.due.length} 站到期需复习（${M.due.map(d => d.item).join("、")}）`);
+    if (M.blindspots && M.blindspots.length) stuckArr.push(`高把握度答错盲区：${M.blindspots.join("、")}`);
+    if (M.errors && M.errors.length) stuckArr.push(`头号错因：「${M.errors[0].reason}」（${M.errors[0].count} 次）`);
+    const stuckTxt = stuckArr.length ? stuckArr.join("；") : "当前无逾期与高危盲区积压。";
+
+    let nextAction = "挑 1 个主线未完成站点，走完「看示范 → 独立作答 → 报把握度测验 → 3 行总结」。";
+    if (M.blindspots && M.blindspots.length) nextAction = `优先回到「${M.blindspots[0]}」重做变式盲测，消除"以为自己会了"的幻觉。`;
+    else if (c.ai_passed > 0 && c.verified === 0) nextAction = `已有 ${c.ai_passed} 站通过 AI 练习：本周必须安排一次未见真题限时测或真实产出盲评，拿到第一份外部硬证据！`;
+
+    el.innerHTML = `
+      <div class="quote-hero" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div>
+          <h2>这一周，你走到哪了</h2>
+          <p>数据全部来自你本机的实测记录，不美化进度，卡点与元认知高估如实标出。</p>
+        </div>
+        <button class="btn-ghost" id="rv-export-btn">↗ 导出学习档案 / 手机续接</button>
+      </div>
+
+      <div class="grid-4">
+        <div class="card">
+          <div style="font-size:12px;color:var(--ink-secondary)">连续活跃</div>
+          <div class="ledger-num">${M.active_streak_days} <span style="font-size:13px;font-weight:400">天</span></div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">累计学习 ${M.total_mins} 分钟</div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--ink-secondary)">外部硬证据完成率</div>
+          <div class="ledger-num" style="color:var(--st-verif)">${Math.round((c.verified / total) * 100)}% <span style="font-size:13px;font-weight:400;color:var(--ink-secondary)">${c.verified}/${M.nodes.length} 站</span></div>
+          <div style="font-size:11px;color:var(--st-aipass);margin-top:4px">另有 ${c.ai_passed} 站练习达标待外部验证</div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--ink-secondary)">元认知校准 Brier</div>
+          <div class="ledger-num">${cal.brier != null ? cal.brier.toFixed(3) : "-"}</div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">${cal.over_bias != null ? (cal.over_bias > 0 ? "平均高估 +" + Math.round(cal.over_bias * 100) + "%" : "平均偏差 " + Math.round(cal.over_bias * 100) + "%") : "0 最准，瞎猜 50% 得 0.25"}</div>
+        </div>
+        <div class="card">
+          <div style="font-size:12px;color:var(--ink-secondary)">待复习与错题队列</div>
+          <div class="ledger-num" style="color:var(--st-due)">${(M.due || []).length + (M.blindspots || []).length} <span style="font-size:13px;font-weight:400">项</span></div>
+          <div style="font-size:11px;color:var(--ink-muted);margin-top:4px">高把握度答错盲区 ${(M.blindspots || []).length} 项</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="sec-label"><span>能力四维雷达</span><span>实线：当前实测 vs 虚线：初始基线</span></div>
+          ${buildRadarSvg(M.dims || [])}
+          ${(cal.bins && cal.bins.length) ? `
+            <div class="sec-label" style="margin-top:14px"><span>把握度校准表（防"以为自己会了"）</span></div>
+            <table class="compact">
+              <tr><th>作答前把握度</th><th>题数</th><th>实际正确率</th><th>高估/低估偏差</th></tr>
+              ${cal.bins.map(b => `<tr>
+                <td>${esc(b.label)}</td>
+                <td>${b.count}</td>
+                <td>${Math.round(b.acc * 100)}%</td>
+                <td style="font-weight:700;color:${b.diff > 0.15 ? 'var(--st-due)' : 'inherit'}">${b.diff >= 0 ? '+' : ''}${Math.round(b.diff * 100)}%</td>
+              </tr>`).join("")}
+            </table>
+          ` : ""}
+        </div>
+
+        <div class="card">
+          <div class="sec-label"><span>每周三段式复盘（自动生成）</span><span>对齐止损线</span></div>
+          <div style="border-left:3px solid var(--st-verif);padding-left:12px;margin-bottom:16px">
+            <div style="font-size:12px;color:var(--ink-secondary)">1 · 这周实际完成了什么</div>
+            <div style="font-size:13px;margin-top:3px">${esc(doneTxt)}</div>
+          </div>
+          <div style="border-left:3px solid var(--st-due);padding-left:12px;margin-bottom:16px">
+            <div style="font-size:12px;color:var(--ink-secondary)">2 · 卡在哪里</div>
+            <div style="font-size:13px;margin-top:3px">${esc(stuckTxt)}</div>
+          </div>
+          <div style="border-left:3px solid var(--cta);padding-left:12px;margin-bottom:16px">
+            <div style="font-size:12px;color:var(--ink-secondary)">3 · 下周改哪一步</div>
+            <div style="font-size:13px;font-weight:700;margin-top:3px">${esc(nextAction)}</div>
+          </div>
+
+          ${(M.rules && M.rules.length) ? `
+            <div class="sec-label" style="margin-top:16px"><span>个人《学习说明书》已验证规则</span></div>
+            <ul class="triage-list">${M.rules.map(r => `<li>📌 ${esc(r)}</li>`).join("")}</ul>
+          ` : ""}
+        </div>
+      </div>
+    `;
+
+    document.getElementById("rv-export-btn").addEventListener("click", () => {
+      document.getElementById("btn-open-sync").click();
+    });
+  }
+
+  function renderAll() {
+    const M = curData();
+    document.getElementById("hdr-title").textContent = M.goal_name || "有据学习 · Evidence Learning";
+    const sub = [M.stage, M.deadline ? ("截止 " + M.deadline) : "", "本地离线零水印"].filter(Boolean).join(" · ");
+    document.getElementById("hdr-sub").textContent = sub;
+
+    const demoBtn = document.getElementById("btn-toggle-demo");
+    demoBtn.classList.toggle("demo-active", useDemo);
+    demoBtn.textContent = useDemo ? "当前：样例演示（点此切真实库）" : "切换样例演示";
+
+    const bannerSlot = document.getElementById("demo-banner-slot");
+    if (useDemo) {
+      bannerSlot.innerHTML = `<div class="demo-banner">
+        <span>👀 <strong>当前正在预览内置交互样例（「短视频剪辑师转岗」完整演示集）</strong>——所有路线节点、任务链网状图与闯关台均可直接点击体验，不会污染你的个人真实数据。</span>
+        ${!vaultIsEmpty ? `<button class="btn-ghost" id="banner-exit-demo">切回我的真实学习库</button>` : ""}
+      </div>`;
+      const exBtn = document.getElementById("banner-exit-demo");
+      if (exBtn) exBtn.addEventListener("click", () => { useDemo = false; renderAll(); });
+    } else {
+      bannerSlot.innerHTML = "";
+    }
+
+    if (activeView === "overview") renderOverview(M);
+    else if (activeView === "roadmap") renderRoadmap(M);
+    else if (activeView === "rolemap") renderRoleMap(M);
+    else if (activeView === "review") renderReview(M);
+  }
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
