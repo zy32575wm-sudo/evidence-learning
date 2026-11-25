@@ -1473,13 +1473,13 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
     });
     document.getElementById("btn-start-today-cls").addEventListener("click", () => {
       selectedNodeName = focusNode.name;
-      clsStep = "lesson";
+      clsStep = "flash";
       clsQuizIdx = 0;
       clsAnswered = null;
       switchView("classroom");
     });
     document.getElementById("btn-enter-cls").addEventListener("click", () => {
-      clsStep = "lesson";
+      clsStep = "flash";
       clsQuizIdx = 0;
       clsAnswered = null;
       switchView("classroom");
@@ -1571,11 +1571,46 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
   }
 
   // ==================== VIEW 2B: INTERACTIVE CLASSROOM (NO-TYPING LEARN & QUIZ) ====================
-  let clsStep = "lesson"; // lesson | qa | quiz
+  let clsStep = "flash"; // flash (极简秒判默认!) | lesson | qa | quiz
   let clsQuizIdx = 0;
   let clsConf = 85;
   let clsAnswered = null; // { chosenIdx, correct, quiz }
   let clsSessionResults = [];
+
+  function speakText(txt) {
+    if (!("speechSynthesis" in window)) { toast("当前浏览器不支持语音播报"); return; }
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt);
+    u.lang = "zh-CN";
+    u.rate = 1.2;
+    window.speechSynthesis.speak(u);
+  }
+
+  function makeBinaryPair(q, seedIdx) {
+    if (q.short_opts && q.short_opts.length === 2 && typeof q.short_ans === "number") {
+      return {
+        stem: q.short_stem || q.stem,
+        opts: q.short_opts,
+        ans: q.short_ans,
+        punchline: q.punchline || (q.explain || "").split(/[。；！]/)[0]
+      };
+    }
+    const opts = q.options || [];
+    const rightTxt = (opts[q.answer] || "").replace(/^[A-D]\.\s*/, "");
+    let wrongIdx = (q.answer + 1) % Math.max(1, opts.length);
+    for (let i = 0; i < opts.length; i++) {
+      if (i !== q.answer && (opts[i] || "").length > 6) { wrongIdx = i; break; }
+    }
+    const wrongTxt = (opts[wrongIdx] || "").replace(/^[A-D]\.\s*/, "");
+    const putRightFirst = (seedIdx % 2 === 1);
+    const pair = putRightFirst ? [rightTxt, wrongTxt] : [wrongTxt, rightTxt];
+    return {
+      stem: q.short_stem || q.stem.replace(/^【.*?】/, ""),
+      opts: pair.map(s => s.length > 42 ? s.slice(0, 42) + "…" : s),
+      ans: putRightFirst ? 0 : 1,
+      punchline: q.punchline || (q.explain || "").split(/[。；！]/)[0]
+    };
+  }
 
   function renderClassroom(M) {
     const el = document.getElementById("view-classroom");
@@ -1608,7 +1643,58 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
     }).join("");
 
     let bodyHtml = "";
-    if (clsStep === "lesson") {
+    if (clsStep === "flash") {
+      if (!quizzes.length) {
+        bodyHtml = `<div style="text-align:center;padding:28px 10px;font-size:15px">本站直接动手交付即可，无需刷题。</div>`;
+      } else if (clsQuizIdx >= quizzes.length) {
+        const okCnt = clsSessionResults.filter(x => x.ok).length;
+        const hasNext = selIdx + 1 < nodes.length;
+        bodyHtml = `
+          <div style="text-align:center;padding:28px 12px">
+            <div style="font-size:36px;font-weight:900;color:var(--st-verif)">${okCnt} / ${quizzes.length} 秒过！</div>
+            <div style="margin:12px 0 20px"><span class="badge ${st.badgeCls}" style="font-size:14px;padding:5px 12px">${st.label}</span></div>
+            <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap">
+              <button class="btn-ghost" id="cls-retry-quiz">再来一轮</button>
+              ${hasNext ? `<button class="btn-cta" style="font-size:15px;padding:11px 22px" id="cls-next-station">下一站：${esc(nodes[selIdx + 1].name)} →</button>` : `<button class="btn-cta" id="cls-finish-to-dag">全部刷完，回画布 →</button>`}
+            </div>
+          </div>
+        `;
+      } else {
+        const q = quizzes[clsQuizIdx];
+        const bp = makeBinaryPair(q, selIdx + clsQuizIdx);
+        bodyHtml = `
+          <div style="max-width:640px;margin:8px auto;padding:10px 4px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+              <span style="font-size:13px;font-weight:700;color:var(--ink-secondary)">⚡ 第 ${clsQuizIdx + 1} / ${quizzes.length} 张 · 凭直觉2秒二选一</span>
+              <button class="btn-ghost" id="btn-speak-q">🔊 读给我听（免看字）</button>
+            </div>
+
+            <div style="font-size:21px;font-weight:800;line-height:1.45;margin-bottom:22px">${esc(bp.stem)}</div>
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              ${bp.opts.map((ot, oi) => {
+                let cls = "";
+                if (clsAnswered) {
+                  if (oi === bp.ans) cls = "correct";
+                  else if (oi === clsAnswered.chosenIdx) cls = "wrong";
+                }
+                return `<button class="opt-btn ${cls}" data-bopt="${oi}" data-bans="${bp.ans}" ${clsAnswered ? 'disabled' : ''}
+                  style="min-height:88px;font-size:15.5px;font-weight:700;justify-content:center;text-align:center;align-items:center;margin:0">
+                  <span>${esc(ot)}</span>
+                </button>`;
+              }).join("")}
+            </div>
+
+            ${clsAnswered ? `
+              <div class="explain-card ${clsAnswered.correct ? 'ok' : 'err'}" style="margin-top:16px;font-size:15px;font-weight:700;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+                <span>${clsAnswered.correct ? '✅ 秒懂口诀：' : '💡 记住这一句就够：'}${esc(bp.punchline)}</span>
+                <button class="btn-cta" id="cls-next-q" style="white-space:nowrap">${clsQuizIdx + 1 < quizzes.length ? '下一张 →' : '看结果 →'}</button>
+              </div>
+            ` : ""}
+          </div>
+        `;
+      }
+    } else if (clsStep === "lesson") {
       const whyTxt = crs.why || `掌握「${sel.name}」的客观达标特征，避免凭主观感觉判断。`;
       const pts = (crs.core_points && crs.core_points.length)
         ? crs.core_points
@@ -1760,9 +1846,10 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
           </div>
 
           <div class="cls-subtabs">
-            <button class="cls-pill ${clsStep==='lesson'?'active':''}" data-cstep="lesson">① 核心精讲与正反例</button>
-            <button class="cls-pill ${clsStep==='qa'?'active':''}" data-cstep="qa">② 点选追问（${qas.length}）</button>
-            <button class="cls-pill ${clsStep==='quiz'?'active':''}" data-cstep="quiz">③ 闯关做题（${quizzes.length}）</button>
+            <button class="cls-pill ${clsStep==='flash'?'active':''}" data-cstep="flash">⚡ 极简秒判（零长文）</button>
+            <button class="cls-pill ${clsStep==='quiz'?'active':''}" data-cstep="quiz">🎯 完整试标题（${quizzes.length}）</button>
+            <button class="cls-pill ${clsStep==='lesson'?'active':''}" data-cstep="lesson">📖 备查讲义</button>
+            ${qas.length ? `<button class="cls-pill ${clsStep==='qa'?'active':''}" data-cstep="qa">💬 问答（${qas.length}）</button>` : ""}
           </div>
 
           ${bodyHtml}
@@ -1772,7 +1859,7 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
 
     el.querySelectorAll("[data-cls-node]").forEach(item => item.addEventListener("click", () => {
       selectedNodeName = item.dataset.clsNode;
-      clsStep = "lesson";
+      clsStep = "flash";
       clsQuizIdx = 0;
       clsAnswered = null;
       clsSessionResults = [];
@@ -1780,7 +1867,38 @@ table.compact th { color: var(--ink-secondary); background: var(--surface-subtle
     }));
     el.querySelectorAll("[data-cstep]").forEach(b => b.addEventListener("click", () => {
       clsStep = b.dataset.cstep;
-      if (clsStep === "quiz" && clsQuizIdx >= quizzes.length) { clsQuizIdx = 0; clsAnswered = null; clsSessionResults = []; }
+      if ((clsStep === "quiz" || clsStep === "flash") && clsQuizIdx >= quizzes.length) { clsQuizIdx = 0; clsAnswered = null; clsSessionResults = []; }
+      renderClassroom(curData());
+    }));
+    const spkBtn = document.getElementById("btn-speak-q");
+    if (spkBtn && quizzes[clsQuizIdx]) {
+      spkBtn.addEventListener("click", () => {
+        const bp = makeBinaryPair(quizzes[clsQuizIdx], selIdx + clsQuizIdx);
+        speakText(bp.stem + "。左边：" + bp.opts[0] + "。右边：" + bp.opts[1]);
+      });
+    }
+    el.querySelectorAll("[data-bopt]").forEach(bb => bb.addEventListener("click", () => {
+      if (clsAnswered) return;
+      const chosen = Number(bb.dataset.bopt);
+      const ans = Number(bb.dataset.bans);
+      const q = quizzes[clsQuizIdx];
+      const bp = makeBinaryPair(q, selIdx + clsQuizIdx);
+      const isOk = chosen === ans;
+      clsAnswered = { chosenIdx: chosen, correct: isOk };
+      clsSessionResults.push({ ok: isOk });
+      const drafts = getDrafts();
+      drafts.push({
+        date: new Date().toISOString().slice(0, 10),
+        goal: M.goal_id || M.goal_name || "",
+        item: sel.name,
+        q: bp.stem.slice(0, 32),
+        ans: bp.opts[chosen].slice(0, 24),
+        res: isOk ? "对" : "错",
+        conf: 80,
+        err: isOk ? "" : "概念不懂",
+        src: q.type === "heldout" ? "真题" : "AI出题"
+      });
+      setDrafts(drafts);
       renderClassroom(curData());
     }));
     const goQa = document.getElementById("cls-go-qa");

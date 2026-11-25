@@ -17,6 +17,7 @@
 | 方法 | 英文 | 一句话 | 确定性 |
 |---|---|---|---|
 | 主动回忆 / 测试效应 | Retrieval Practice / Testing Effect | 自己从记忆里提取，比反复重读看书有效得多 | 确定 |
+| 前测效应（先猜后学） | Pretesting Effect（Kornell 等） | 不看讲义先凭直觉盲猜判例（哪怕猜错），再看一句话答案，专治"见长文就犯困倦怠" | 确定 |
 | 间隔复习 | Spaced Repetition | 间隔逐渐拉长的复习；Anki 的 FSRS 算法可按个人记录动态调间隔 | 确定 |
 | 交错练习 | Interleaving | 不同题型混在一起练，提高辨别"该用哪种方法"的能力 | 确定 |
 | 例题效应 / 渐退例题 | Worked Example Effect / Faded Examples | 新手先看完整例题，再逐步撤掉步骤自己补全 | 确定 |
